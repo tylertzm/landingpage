@@ -68,6 +68,16 @@
             padding: 0.75rem 1.5rem;
             border-radius: 1rem;
             display: inline-block;
+            transition: all 0.3s ease;
+        }
+        
+        .text-glass-panel:hover {
+            background: rgba(255, 255, 255, 0.4);
+            transform: translateY(-2px);
+            box-shadow: 
+                0 8px 24px 0 rgba(0, 0, 0, 0.15),
+                inset 0 1px 0 0 rgba(255, 255, 255, 0.4),
+                inset 0 8px 16px -4px rgba(211, 211, 211, 0.5);
         }
         
         /* iOS-style glass panel for screenshot */
@@ -178,10 +188,63 @@
             100% { transform: translateX(-50%); }
         }
 
+        .logo-carousel {
+            position: relative;
+        }
+        
         .logo-carousel-inner {
             display: flex;
             width: fit-content; /* Allow the content to define its width */
             animation: scroll 15s linear infinite;
+        }
+        
+        .logo-carousel-inner.paused {
+            animation-play-state: paused;
+        }
+        
+        .carousel-arrow {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(255, 255, 255, 0.3);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(0, 0, 0, 0.08);
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 10;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+        }
+        
+        @media (min-width: 768px) {
+            .carousel-arrow {
+                display: flex;
+            }
+        }
+        
+        .carousel-arrow:hover {
+            background: rgba(255, 255, 255, 0.5);
+            transform: translateY(-50%) scale(1.1);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+        }
+        
+        .carousel-arrow-left {
+            left: -24px;
+        }
+        
+        .carousel-arrow-right {
+            right: -24px;
+        }
+        
+        .carousel-arrow svg {
+            width: 24px;
+            height: 24px;
+            fill: black;
         }
 
         /* NEW: Styles for the card stack */
@@ -425,8 +488,20 @@
                     <!-- LOGO CAROUSEL WITH ACTUAL SVG LOGOS -->
                     <div class="w-full overflow-hidden py-6 sm:py-8 mt-8 sm:mt-12 mb-8 sm:mb-12 z-20"> 
                         <p class="text-xs uppercase tracking-wider text-gray-600 text-center mb-3 sm:mb-4 font-serif">Trusted partners</p>
-                        <div class="logo-carousel overflow-hidden">
-                            <div class="logo-carousel-inner">
+                        <div class="logo-carousel overflow-hidden relative">
+                            <!-- Left Arrow -->
+                            <button class="carousel-arrow carousel-arrow-left" onclick="scrollCarousel('left')">
+                                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/>
+                                </svg>
+                            </button>
+                            <!-- Right Arrow -->
+                            <button class="carousel-arrow carousel-arrow-right" onclick="scrollCarousel('right')">
+                                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M8.59 16.59L10 18l6-6-6-6-1.41 1.41L13.17 12z"/>
+                                </svg>
+                            </button>
+                            <div class="logo-carousel-inner" id="logoCarouselInner">
                                 <!-- Duplicated sets for infinite scroll effect --><div class="flex space-x-12 sm:space-x-20 items-center"> 
                                     <!-- Apple -->
                                     <div class="logo-carousel-item w-24 sm:w-32 h-8 sm:h-10 flex items-center justify-center flex-shrink-0">
@@ -856,7 +931,42 @@
                     }
                 });
             }
+        });
 
+        // Carousel control functionality
+        function scrollCarousel(direction) {
+            const carousel = document.getElementById('logoCarouselInner');
+            if (!carousel) return;
+            
+            // Pause the animation
+            carousel.classList.add('paused');
+            
+            // Get current transform
+            const style = window.getComputedStyle(carousel);
+            const matrix = new DOMMatrix(style.transform);
+            const currentX = matrix.m41;
+            
+            // Calculate scroll amount (one item width + gap)
+            const scrollAmount = 200; // Approximate width of one logo + gap
+            
+            let newX;
+            if (direction === 'left') {
+                newX = currentX + scrollAmount;
+            } else {
+                newX = currentX - scrollAmount;
+            }
+            
+            // Apply the transform
+            carousel.style.transform = `translateX(${newX}px)`;
+            
+            // Resume animation after a delay
+            setTimeout(() => {
+                carousel.classList.remove('paused');
+                carousel.style.transform = '';
+            }, 3000);
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
             // Scroll animations for boxes
             const observerOptions = {
                 threshold: 0.15,
