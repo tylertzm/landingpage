@@ -1,0 +1,1188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wikipedia - The Free Encyclopedia</title>
+    <!-- Load Tailwind CSS --><script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Load Creative Font Combination: Montserrat (Serif) and Merriweather (Sans-Serif) --><link href="https://fonts.googleapis.com/css2?family=Merriweather:ital,wght@0,300;0,400;0,700;1,300;1,400;1,700&family=Montserrat:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+    
+    <!-- Configure Tailwind to use the new fonts (SWAPPED) --><script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    // NEW: Montserrat (Serif) is for titles
+                    fontFamily: {
+                        serif: ['Times New Roman´', 'ui-sans-serif', 'system-ui'],
+                        // NEW: Merriweather (Sans-Serif) is for details/body
+                        sans: ['Merriweather', 'ui-serif', 'Georgia'],
+                    },
+                    transitionProperty: {
+                        'max-height': 'max-height'
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        /* Custom styles for gradient and glassmorphism effects */
+        .gradient-bg {
+            /* Black top 30% blending down to white, smoother transition */
+            background: linear-gradient(to bottom, 
+                #0a0a0a 0%, #0a0a0a 30%, 
+                rgba(0, 0, 0, 0.7) 50%, 
+                rgba(255, 255, 255, 0.5) 80%, 
+                white 100%);
+        }
+
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 8px 32px 0 rgba(0, 31, 63, 0.37); /* Shadow matching dark blue background */
+        }
+        
+        /* First box glass panel effect */
+        .hero-glass-panel {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(5px) saturate(180%);
+            -webkit-backdrop-filter: blur(5px) saturate(180%);
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            box-shadow: 
+                0 8px 32px 0 rgba(0, 0, 0, 0.05),
+                inset 0 1px 0 0 rgba(255, 255, 255, 0.2);
+        }
+        
+        /* Individual text glass panels */
+        .text-glass-panel {
+            background: rgba(255, 255, 255, 0.25);
+            backdrop-filter: blur(8px) saturate(150%);
+            -webkit-backdrop-filter: blur(8px) saturate(150%);
+            border: 1px solid rgba(0, 0, 0, 0.08);
+            box-shadow: 
+                0 4px 16px 0 rgba(0, 0, 0, 0.1),
+                inset 0 1px 0 0 rgba(255, 255, 255, 0.3),
+                inset 0 8px 16px -4px rgba(211, 211, 211, 0.4);
+            padding: 0.75rem 1.5rem;
+            border-radius: 1rem;
+            display: inline-block;
+        }
+        
+        /* iOS-style glass panel for screenshot */
+        .glass-screenshot-panel {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px) saturate(180%);
+            -webkit-backdrop-filter: blur(20px) saturate(180%);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            box-shadow: 
+                0 8px 32px 0 rgba(0, 0, 0, 0.2),
+                0 2px 8px 0 rgba(0, 0, 0, 0.1),
+                inset 0 1px 0 0 rgba(255, 255, 255, 0.15);
+            transform: rotateX(30deg);
+            transform-style: preserve-3d;
+            transform-origin: center center;
+            transition: transform 0.1s ease-out;
+            will-change: transform;
+        }
+        
+        /* Glass header */
+        .glass-header {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(20px) saturate(180%);
+            -webkit-backdrop-filter: blur(20px) saturate(180%);
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+            box-shadow: 0 4px 16px 0 rgba(0, 0, 0, 0.1);
+        }
+
+        /* Ensure smooth scrolling for navigation links */
+        html {
+            scroll-behavior: smooth;
+        }
+        
+        /* NEW: Apply Merriweather (Sans-Serif) as the default font for the whole body */
+        body {
+            font-family: 'Merriweather', sans-serif; 
+            background-color: #ffffff; 
+        }
+
+        /* Scroll animations for boxes */
+        .scroll-fade-in {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+        }
+
+        .scroll-fade-in.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Box scaling and transform on scroll */
+        section {
+            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), 
+                        opacity 0.6s ease-out, 
+                        box-shadow 0.4s ease-out;
+        }
+
+        section.scroll-fade-in:not(.visible) {
+            transform: translateY(40px) scale(0.95);
+            opacity: 0;
+        }
+
+        section.scroll-fade-in.visible {
+            transform: translateY(0) scale(1);
+            opacity: 1;
+        }
+
+        /* Mobile menu animations */
+        #mobile-menu {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1), 
+                        opacity 0.3s ease-out,
+                        transform 0.3s ease-out;
+            opacity: 0;
+            transform: translateY(-10px);
+        }
+
+        #mobile-menu:not(.hidden) {
+            max-height: 500px;
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        #mobile-menu a {
+            opacity: 0;
+            transform: translateX(-20px);
+            transition: opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1), 
+                        transform 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+                        background-color 0.2s ease;
+        }
+
+        #mobile-menu:not(.hidden) a {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        #mobile-menu:not(.hidden) a:nth-child(1) { transition-delay: 0.05s; }
+        #mobile-menu:not(.hidden) a:nth-child(2) { transition-delay: 0.1s; }
+        #mobile-menu:not(.hidden) a:nth-child(3) { transition-delay: 0.15s; }
+        #mobile-menu:not(.hidden) a:nth-child(4) { transition-delay: 0.2s; }
+        #mobile-menu:not(.hidden) a:nth-child(5) { transition-delay: 0.25s; }
+
+        /* Keyframes for a subtle, infinite logo carousel scroll effect */
+        @keyframes scroll {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+        }
+
+        .logo-carousel-inner {
+            display: flex;
+            width: fit-content; /* Allow the content to define its width */
+            animation: scroll 15s linear infinite;
+        }
+
+        /* NEW: Styles for the card stack */
+        #card-stack-container {
+            perspective: 1000px;
+        }
+
+        .card-stack-item {
+            transition: transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1), 
+                        opacity 0.5s cubic-bezier(0.4, 0, 0.2, 1),
+                        box-shadow 0.3s ease;
+            cursor: grab;
+            will-change: transform, opacity;
+        }
+
+        .card-stack-item:hover {
+            box-shadow: 0 12px 40px 0 rgba(0, 0, 0, 0.15);
+        }
+
+        .card-stack-item:active {
+            cursor: grabbing;
+        }
+
+        .card-stack-item.is-dragging {
+            transition: none; /* Disable transitions while dragging */
+            cursor: grabbing;
+            z-index: 100 !important;
+        }
+        
+        /* Enhanced swipe animation */
+        .card-stack-item.swiping-out {
+            transition: transform 0.6s cubic-bezier(0.68, -0.55, 0.27, 1.55), 
+                        opacity 0.5s ease-out;
+        }
+        
+        .card-stack-item.returning {
+            transition: transform 0.5s cubic-bezier(0.68, -0.55, 0.27, 1.55), 
+                        opacity 0.4s ease-out;
+        }
+        
+        /* Energy grid animation background */
+        @keyframes gridPulse {
+            0%, 100% { opacity: 0.15; }
+            50% { opacity: 0.35; }
+        }
+        
+        @keyframes gridMove {
+            0% { transform: translateY(0) translateX(0); }
+            100% { transform: translateY(-50px) translateX(-50px); }
+        }
+        
+        @keyframes dotShootHorizontal {
+            0% { 
+                left: 50%; 
+                opacity: 1;
+            }
+            100% { 
+                left: 100%; 
+                opacity: 0;
+            }
+        }
+        
+        @keyframes dotShootVertical {
+            0% { 
+                top: 50%; 
+                opacity: 1;
+            }
+            100% { 
+                top: 100%; 
+                opacity: 0;
+            }
+        }
+        
+        .energy-grid-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            z-index: 0;
+            background: white;
+        }
+        
+        .energy-grid-bg::before {
+            content: '';
+            position: absolute;
+            top: -10%;
+            left: -10%;
+            width: 120%;
+            height: 120%;
+            background-image: 
+                linear-gradient(rgba(0, 0, 0, 0.15) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 0, 0, 0.15) 1px, transparent 1px);
+            background-size: 80px 80px;
+            animation: gridMove 20s linear infinite, gridPulse 4s ease-in-out infinite;
+            mask-image: radial-gradient(ellipse at center, 
+                rgba(0, 0, 0, 1) 0%, 
+                rgba(0, 0, 0, 0.6) 40%, 
+                rgba(0, 0, 0, 0.2) 70%, 
+                rgba(0, 0, 0, 0) 100%);
+            -webkit-mask-image: radial-gradient(ellipse at center, 
+                rgba(0, 0, 0, 1) 0%, 
+                rgba(0, 0, 0, 0.6) 40%, 
+                rgba(0, 0, 0, 0.2) 70%, 
+                rgba(0, 0, 0, 0) 100%);
+        }
+        
+        .energy-grid-bg::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 300px;
+            height: 300px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(0, 0, 0, 0.08) 0%, transparent 70%);
+            transform: translate(-50%, -50%);
+            animation: gridPulse 3s ease-in-out infinite alternate;
+        }
+
+        /* Responsive improvements */
+        @media (max-width: 768px) {
+            .gradient-bg {
+                min-height: 100vh;
+                padding-bottom: 8rem;
+            }
+            
+            #box-1 {
+                padding-top: 3rem;
+                padding-bottom: 8rem;
+            }
+            
+            .hero-glass-panel {
+                padding: 2rem 1.5rem !important;
+                margin: 0 0.5rem;
+            }
+            
+            #box-2 {
+                margin-top: -4rem;
+                padding: 6rem 0 4rem;
+            }
+            
+            .glass-panel {
+                padding: 1rem;
+                margin: 1rem 0;
+            }
+            
+            .glass-screenshot-panel {
+                margin-top: -8rem;
+            }
+            
+            #card-stack-container {
+                height: 350px;
+            }
+        }
+
+        @media (max-width: 640px) {
+            .hero-glass-panel {
+                padding: 1.5rem 1rem !important;
+                margin: 0;
+            }
+            
+            .logo-carousel-inner {
+                animation: scroll 20s linear infinite;
+            }
+            
+            .card-stack-item {
+                padding: 1.5rem;
+            }
+            
+            #box-1 h1 {
+                font-size: 2rem;
+                line-height: 1.2;
+            }
+            
+            #box-1 p {
+                font-size: 1rem;
+            }
+        }
+    </style>
+</head>
+<!-- NEW: Body background set to bg-white, default font is font-sans (Merriweather) -->
+<body class="bg-white text-gray-800 font-sans">
+
+    <div class="relative min-h-screen">
+        <!-- Header --><header class="sticky top-0 z-50 glass-header rounded-b-3xl">
+            <div class="max-w-7xl mx-auto flex justify-between items-center px-6 sm:px-8 lg:px-12 py-5">
+                <!-- NEW: Title font set to font-serif (Montserrat) --><a href="#" class="flex items-center space-x-3 text-2xl font-bold text-black font-serif flex-shrink-0">
+                    <!-- Wikipedia W Logo --><svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="currentColor" class="lucide lucide-book-open">
+                        <path d="M12 2L2 7v10c0 5.55 3.84 10 10 10s10-4.45 10-10V7L12 2z"/>
+                    </svg>
+                    <span>WIKIPEDIA</span>
+                </a>
+                
+                <!-- NEW: Nav links set to font-serif (Montserrat) --><nav class="hidden md:flex space-x-6 font-serif items-center ml-auto">
+                    <a href="#features" class="text-gray-700 hover:text-black transition duration-150 px-3 py-2 rounded-lg font-medium text-base">How It Works</a>
+                    <a href="#pricing" class="text-gray-700 hover:text-black transition duration-150 px-3 py-2 rounded-lg font-medium text-base">Support</a>
+                    <a href="#box-2" class="text-gray-700 hover:text-black transition duration-150 px-3 py-2 rounded-lg font-medium text-base">About</a>
+                </nav>
+
+                <!-- Mobile menu toggle --><button id="mobile-menu-toggle" class="md:hidden p-2 text-gray-700 hover:text-black rounded-lg ml-auto">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-menu"><line x1="4" x2="20" y1="12" y2="12"/><line x1="4" x2="20" y1="6" y2="6"/><line x1="4" x2="20" y1="18" y2="18"/></svg>
+                </button>
+            </div>
+            
+            <!-- Mobile Navigation Menu --><div id="mobile-menu" class="md:hidden hidden bg-white/95 backdrop-blur-sm border-t border-gray-200">
+                <nav class="px-4 py-2 space-y-1 font-serif">
+                    <a href="#features" class="block text-gray-600 hover:text-black transition duration-150 p-3 rounded-lg font-medium">How It Works</a>
+                    <a href="#pricing" class="block text-gray-600 hover:text-black transition duration-150 p-3 rounded-lg font-medium">Support</a>
+                    <a href="#box-2" class="block text-gray-600 hover:text-black transition duration-150 p-3 rounded-lg font-medium">About</a>
+                </nav>
+            </div>
+        </header>
+
+        <main class="w-full px-4 sm:px-6 lg:px-8">
+            <!-- 1. Hero Section (Gradient Background) - Extended for glass panel overlay -->
+            <section id="box-1" class="gradient-bg min-h-[100vh] sm:min-h-[120vh] flex flex-col items-center justify-center pt-16 sm:pt-20 pb-40 sm:pb-60 text-black relative z-10 rounded-3xl overflow-hidden shadow-2xl mt-8 w-11/12 mx-auto">
+                <!-- Energy Grid Background -->
+                <div class="energy-grid-bg"></div>
+                
+                <!-- Content Wrapper (no glass panel) -->
+                <div class="w-full max-w-4xl mx-auto text-center px-4 sm:px-6 md:px-8 lg:px-12 py-8 sm:py-12 md:py-16 relative z-10">
+                    <!-- NEW: Title font set to font-serif (Montserrat) -->
+                    <div class="mb-3 sm:mb-4">
+                        <p class="text-xs sm:text-sm uppercase tracking-widest font-semibold text-gray-600 font-serif text-glass-panel">The Free Encyclopedia</p>
+                    </div>
+                    <!-- NEW: Title font set to font-serif (Montserrat) -->
+                    <div class="mb-4 sm:mb-6">
+                        <h1 class="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-extrabold leading-tight drop-shadow-sm font-serif px-2 text-glass-panel">
+                            Wikipedia
+                        </h1>
+                    </div>
+                    <!-- NEW: Detail font is font-sans (Merriweather) -->
+                    <div class="mb-8 sm:mb-10 flex justify-center">
+                        <p class="text-base sm:text-lg md:text-xl lg:text-2xl font-light text-gray-700 max-w-3xl px-2 text-glass-panel">
+                            The world's largest free online encyclopedia.
+                        </p>
+                    </div>
+                    
+                    <!-- LOGO CAROUSEL WITH ACTUAL SVG LOGOS -->
+                    <div class="w-full overflow-hidden py-6 sm:py-8 mt-8 sm:mt-12 mb-8 sm:mb-12 z-20"> 
+                        <p class="text-xs uppercase tracking-wider text-gray-600 text-center mb-3 sm:mb-4 font-serif">Trusted partners</p>
+                        <div class="logo-carousel overflow-hidden">
+                            <div class="logo-carousel-inner">
+                                <!-- Duplicated sets for infinite scroll effect --><div class="flex space-x-12 sm:space-x-20 items-center"> 
+                                    <!-- Apple -->
+                                    <div class="logo-carousel-item w-24 sm:w-32 h-8 sm:h-10 flex items-center justify-center flex-shrink-0">
+                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="black" class="h-8 sm:h-10 w-auto">
+                                            <path d="M17.05 20.28c-.98.95-2.05.8-3.08.35-1.09-.46-2.09-.48-3.24 0-1.44.62-2.2.44-3.06-.35C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.5-1.31 2.99-2.54 4.09l.01-.01zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z"/>
+                                        </svg>
+                                    </div>
+                                    <!-- Microsoft -->
+                                    <div class="logo-carousel-item w-24 sm:w-32 h-8 sm:h-10 flex items-center justify-center flex-shrink-0">
+                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="h-7 sm:h-9 w-auto">
+                                            <path fill="#f35022" d="M2 2h9v9H2z"/>
+                                            <path fill="#81bc06" d="M13 2h9v9h-9z"/>
+                                            <path fill="#05a6f0" d="M2 13h9v9H2z"/>
+                                            <path fill="#ffba08" d="M13 13h9v9h-9z"/>
+                                        </svg>
+                                    </div>
+                                    <!-- Google -->
+                                    <div class="logo-carousel-item w-24 sm:w-32 h-8 sm:h-10 flex items-center justify-center flex-shrink-0">
+                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" class="h-6 sm:h-8 w-auto">
+                                            <path fill="#FFC107" d="M43.611 20.083H42V20H24v8h11.303c-1.649 4.84-6.237 8.546-11.303 8.546-6.663 0-12.115-5.385-12.115-12s5.452-12 12.115-12c3.125 0 5.918 1.114 8.169 2.908l6.097-6.097C37.55 5.309 31.97 2 24 2 13.516 2 5.291 9.354 5.291 19.967c0 10.613 8.225 19.167 18.709 19.167 10.931 0 18.349-7.989 18.349-18.795 0-1.151-.12-2.316-.339-3.468z"/>
+                                            <path fill="#FF3D00" d="M6.306 28.016v-8.038H0v14.167c1.373 0 2.658-.337 3.829-.982A12.001 12.001 0 0 0 5.29 39.133L10.985 34.42c-.896-1.558-1.529-3.111-1.848-4.706z"/>
+                                            <path fill="#4CAF50" d="M38.118 29.837c-.777 2.37-2.308 4.708-4.307 6.646L30.134 40.54a18.997 18.997 0 0 0 12.096-17.795h-6.112c-.08 1.155-.308 2.279-.684 3.332z"/>
+                                            <path fill="#1976D2" d="M43.611 20.083h-2.071l-6.097 6.097A12.052 12.052 0 0 1 24 31.967c-1.077 0-2.146-.178-3.15-.526L14.4 36.31l1.737 1.737C18.423 39.421 21.056 40 24 40c9.412 0 16.48-6.529 18.709-17.147l-6.097-6.097z"/>
+                                        </svg>
+                                    </div>
+                                    <!-- Amazon -->
+                                    <div class="logo-carousel-item w-24 sm:w-32 h-8 sm:h-10 flex items-center justify-center flex-shrink-0">
+                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 30" fill="black" class="h-6 sm:h-8 w-auto">
+                                            <path d="M59.5 20.5c-6.5 4.8-16 7.4-24.1 7.4-11.4 0-21.7-4.2-29.5-11.2-.6-.5-.1-1.3.7-.9 8.5 5 19 8 29.8 8 7.3 0 15.4-1.5 22.8-4.7 1.1-.5 2 .7.9 1.6M62.5 17c-.8-1.1-5.5-.5-7.6-.3-.6.1-.7-.5-.2-.9 3.7-2.6 9.8-1.8 10.5-.9.7.8-.2 7-3.7 9.9-.5.5-1 .2-.8-.4.8-1.9 2.6-6.2 1.8-7.4"/>
+                                            <path d="M56 3.6v-2c0-.3.2-.5.5-.5h9.3c.3 0 .5.2.5.5v1.7c0 .3-.2.7-.6 1.3l-4.8 6.9c1.8-.1 3.7.2 5.3 1.1.4.2.5.5.5.8v2.1c0 .3-.3.7-.7.5-3.2-1.7-7.4-1.8-10.9.1-.4.2-.7-.2-.7-.5v-2c0-.4 0-1 .4-1.6l5.6-8h-4.9c-.3 0-.5-.2-.5-.5M20.4 17.5h-2.7c-.3 0-.5-.2-.5-.5V1.6c0-.3.2-.5.6-.5h2.5c.3 0 .5.2.5.5v2h.1c.7-1.9 2-2.8 3.8-2.8 1.8 0 2.9.9 3.7 2.8.7-1.9 2.4-2.8 4-2.8 1.2 0 2.5.5 3.3 1.6.9 1.2.7 3 .7 4.5v10.6c0 .3-.2.5-.6.5h-2.7c-.3 0-.5-.2-.5-.5V7.2c0-.6.1-2.1-.1-2.7-.3-1-.9-1.3-1.8-1.3-.7 0-1.5.5-1.8 1.3-.3.8-.3 2.1-.3 2.7v9.8c0 .3-.2.5-.6.5h-2.7c-.3 0-.5-.2-.5-.5V7.2c0-2.1.3-5.1-1.9-5.1-2.3 0-2.2 2.6-2.2 5.1v9.8c0 .3-.2.5-.6.5M75.8 1c4 0 6.2 3.5 6.2 7.9 0 4.3-2.4 7.6-6.2 7.6-3.9 0-6.1-3.5-6.1-7.8 0-4.4 2.2-7.7 6.1-7.7m0 2.8c-2 0-2.1 2.7-2.1 4.4 0 1.7 0 5.3 2.1 5.3 2 0 2.2-2.8 2.2-4.6 0-1.1-.1-2.6-.4-3.7-.3-1-.8-1.4-1.8-1.4m11.3 13.7h-2.7c-.3 0-.5-.2-.5-.5V1.6c0-.3.2-.5.6-.5h2.5c.2 0 .4.2.5.4v2.4h.1c.8-2.1 1.9-3.2 4-3.2 1.3 0 2.6.5 3.4 1.7.8 1.1.8 3 .8 4.4v10.7c0 .3-.2.5-.6.5h-2.7c-.3 0-.5-.2-.5-.5V7.4c0-2.1.2-5.2-2.3-5.2-.9 0-1.7.6-2.1 1.5-.5 1.1-.6 2.3-.6 3.6v9.7c0 .3-.2.5-.6.5M38.8 17.5c-.2 0-.4-.1-.5-.3l-6.2-15.6c-.1-.2 0-.5.3-.5h2.8c.2 0 .4.1.4.3l4.4 11.9h.1l4.4-11.9c.1-.2.3-.3.5-.3h2.8c.3 0 .4.3.3.5L41.3 17.2c-.1.2-.3.3-.5.3h-2z"/>
+                                        </svg>
+                                    </div>
+                                    <!-- Meta -->
+                                    <div class="logo-carousel-item w-24 sm:w-32 h-8 sm:h-10 flex items-center justify-center flex-shrink-0">
+                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 24" fill="black" class="h-7 sm:h-9 w-auto">
+                                            <path d="M9.464 23.68V13.28l5.76 10.4h1.728l5.76-10.368V23.68h4.864V.32h-4.608L17.152 12.32 11.328.32H6.72V23.68h2.744zm29.472 0V13.28h7.296V9.92h-7.296V3.68h8.064V.32H36.192V23.68h12.928v-3.36h-10.184zm21.696 0V3.68h6.016V.32H53.888v3.36h6.016V23.68h2.728zm18.24 0h2.816l8.896-23.36h-3.136l-7.232 19.36-7.2-19.36h-3.168L79.744 23.68z"/>
+                                        </svg>
+                                    </div>
+                                    <!-- Tesla -->
+                                    <div class="logo-carousel-item w-24 sm:w-32 h-8 sm:h-10 flex items-center justify-center flex-shrink-0">
+                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 342 35" fill="black" class="h-6 sm:h-8 w-auto">
+                                            <path d="M0 0.5h342v34H0z" fill="none"/>
+                                            <path d="M238.1 14.4v21.1h7V21.3h25.6v14.2h7V14.4h-39.6zm-107.5.1v21h7v-8.8h10.7l9.1 8.8h8.9l-10.7-10.1c5.1-1.3 8.6-5.6 8.6-10.9 0-6.4-4.5-11-11.4-11h-22.2zm7 6.1h13.4c3.9 0 6.4 2.1 6.4 5.4 0 3.2-2.5 5.4-6.4 5.4h-13.4v-10.8zM42.7.2v6.1h46.6V.2H42.7zm94.3 0v6.1h46.6V.2h-46.6zM177.1.4h-38.7v5.8H160l-.2.5C149 12.7 139.5 24 134 35h3.1v.5h43.8v-5.8h-28.2l.5-.6C166.4 21.9 176.6 11.3 182 0l-4.9.4zM42.7 21.5c0 7.8 6.4 14.2 14.2 14.2h30.1v-7H59.7c-4.5 0-8.2-3.6-8.2-8.2h-8.8v1zm83.6-7c0-7.8-6.4-14.2-14.2-14.2H84.4v7h26.3c4.5 0 8.2 3.6 8.2 8.2h8.8v-1z"/>
+                                        </svg>
+                                    </div>
+                                    <!-- NVIDIA -->
+                                    <div class="logo-carousel-item w-24 sm:w-32 h-8 sm:h-10 flex items-center justify-center flex-shrink-0">
+                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 24" fill="#76b900" class="h-6 sm:h-8 w-auto">
+                                            <path d="M8.5 4.5v15h3.2V9.8l6.1 9.7h3.4V4.5h-3.2v9.6L11.9 4.5H8.5zm23.7 0l-5.8 15h3.4l1.2-3.3h6.3l1.2 3.3h3.5l-5.8-15h-4zm2 3.8l2.1 5.7h-4.2l2.1-5.7zm13.3-3.8v15h3.2V4.5h-3.2zm17 0h-8.3v15h8.3c3.8 0 6.9-3.1 6.9-7.5S69.3 4.5 65.5 4.5zm-.1 12h-5v-9h5c2.5 0 4.5 2 4.5 4.5s-2 4.5-4.5 4.5zm14.1-12v15h3.2V4.5h-3.2zm15.8 0l-5.1 8.2-5.1-8.2h-3.7v15h3.2V9.8l4.6 7.4h1.9l4.6-7.4v9.7h3.2v-15h-3.6z"/>
+                                        </svg>
+                                    </div>
+                                    <!-- Samsung -->
+                                    <div class="logo-carousel-item w-24 sm:w-32 h-8 sm:h-10 flex items-center justify-center flex-shrink-0">
+                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 24" fill="black" class="h-6 sm:h-8 w-auto">
+                                            <path d="M6 8c-.8 0-1.5.2-2.1.5L3 9V8H0v11h3v-6.5c0-1.1.7-1.9 1.8-1.9.9 0 1.5.6 1.5 1.6V19h3v-7.2c0-2.3-1.5-3.8-3.8-3.8h.5zm12.8 0c-.8 0-1.5.2-2.1.5L16 9V8h-3v11h3v-6.5c0-1.1.7-1.9 1.8-1.9.9 0 1.5.6 1.5 1.6V19h3v-7.2c0-2.3-1.5-3.8-3.8-3.8h.3zm8.7 0c-1.5 0-2.7.5-3.5 1.4-.7.8-1.1 1.9-1.1 3.3v1.6c0 1.4.4 2.5 1.1 3.3.8.9 2 1.4 3.5 1.4s2.7-.5 3.5-1.4c.7-.8 1.1-1.9 1.1-3.3v-1.6c0-1.4-.4-2.5-1.1-3.3-.8-.9-2-1.4-3.5-1.4zm1.7 6.3c0 1.2-.7 2-1.7 2s-1.7-.8-1.7-2v-1.6c0-1.2.7-2 1.7-2s1.7.8 1.7 2v1.6zm6.8-6.3c-1.5 0-2.7.5-3.5 1.4-.7.8-1.1 1.9-1.1 3.3v1.6c0 1.4.4 2.5 1.1 3.3.8.9 2 1.4 3.5 1.4s2.7-.5 3.5-1.4c.7-.8 1.1-1.9 1.1-3.3v-1.6c0-1.4-.4-2.5-1.1-3.3-.8-.9-2-1.4-3.5-1.4zm1.7 6.3c0 1.2-.7 2-1.7 2s-1.7-.8-1.7-2v-1.6c0-1.2.7-2 1.7-2s1.7.8 1.7 2v1.6zM52 19v-7.4c0-2.3 1.3-3.6 3.7-3.6.8 0 1.5.1 2.2.4l.8-2.5c-.9-.3-1.9-.5-3-.5-1.3 0-2.4.5-3.2 1.4l-.5.6V8h-3v11h3zm19.3-11c-1.5 0-2.7.5-3.5 1.4-.7.8-1.1 1.9-1.1 3.3v1.6c0 1.4.4 2.5 1.1 3.3.8.9 2 1.4 3.5 1.4 1.8 0 3.2-.7 4.1-2.2l.3-.5-2.4-1.4-.3.4c-.5.6-1.1.9-1.8.9-1 0-1.7-.6-1.8-1.6h6.6v-2c0-1.4-.4-2.5-1.1-3.3-.8-.9-2-1.3-3.6-1.3zm-1.7 4c.1-1 .8-1.6 1.7-1.6s1.6.6 1.7 1.6h-3.4zm13.9-4c-1.5 0-2.7.5-3.5 1.4-.7.8-1.1 1.9-1.1 3.3v1.6c0 1.4.4 2.5 1.1 3.3.8.9 2 1.4 3.5 1.4s2.7-.5 3.5-1.4c.7-.8 1.1-1.9 1.1-3.3v-1.6c0-1.4-.4-2.5-1.1-3.3-.8-.9-2-1.4-3.5-1.4zm1.7 6.3c0 1.2-.7 2-1.7 2s-1.7-.8-1.7-2v-1.6c0-1.2.7-2 1.7-2s1.7.8 1.7 2v1.6zM94 8v7.4c0 2.3-1.3 3.6-3.7 3.6-.8 0-1.5-.1-2.2-.4l-.8 2.5c.9.3 1.9.5 3 .5 1.3 0 2.4-.5 3.2-1.4l.5-.6V19h3V8h-3zm11.7 0c-.8 0-1.5.2-2.1.5l-.9.5V8h-3v15h3v-4.1l.9.5c.6.3 1.3.5 2.1.5 1.3 0 2.4-.5 3.2-1.4.7-.8 1.1-1.9 1.1-3.3v-1.5c0-1.4-.4-2.5-1.1-3.3-.8-.9-1.9-1.4-3.2-1.4zm1.4 6.2c0 1.2-.7 2-1.7 2s-1.7-.8-1.7-2v-1.5c0-1.2.7-2 1.7-2s1.7.8 1.7 2v1.5z"/>
+                                        </svg>
+                                    </div>
+                                    <!-- Oracle -->
+                                    <div class="logo-carousel-item w-24 sm:w-32 h-8 sm:h-10 flex items-center justify-center flex-shrink-0">
+                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 24" fill="#f80000" class="h-6 sm:h-8 w-auto">
+                                            <path d="M16.2 6C9.8 6 4.6 9.3 4.6 13.5S9.8 21 16.2 21s11.6-3.3 11.6-7.5S22.6 6 16.2 6zm0 12c-4.4 0-8-2-8-4.5s3.6-4.5 8-4.5 8 2 8 4.5-3.6 4.5-8 4.5zm26.4-6.5c0 2.5-1.3 4.5-3.8 4.5s-3.8-2-3.8-4.5V6h-3.5v5.5c0 4.2 2.5 7.5 7.3 7.5s7.3-3.3 7.3-7.5V6h-3.5v5.5zM55.8 6c-1.6 0-2.9.6-3.8 1.7V6h-3.5v13h3.5v-6.8c0-1.3.9-2.2 2.2-2.2 1.2 0 2.1.9 2.1 2.2V19h3.5v-7.5c0-3-2-5.5-4-5.5zm20.8 0c-5.2 0-9.4 3.3-9.4 7.5s4.2 7.5 9.4 7.5c3.2 0 6-1.3 7.6-3.4l-2.7-1.6c-1 1.3-2.6 2-4.9 2-2.5 0-4.6-1.3-5.4-3.5h13.7v-1c0-4.2-3.1-7.5-8.3-7.5zm-5.4 6c.8-2.1 2.8-3.5 5.4-3.5s4.6 1.4 5.4 3.5h-10.8zM93.1 6c-1.6 0-2.9.6-3.8 1.7V6h-3.5v13h3.5v-6.8c0-1.3.9-2.2 2.2-2.2 1.2 0 2.1.9 2.1 2.2V19h3.5v-7.5c0-3-2-5.5-4-5.5z"/>
+                                        </svg>
+                                    </div>
+                                    <!-- IBM -->
+                                    <div class="logo-carousel-item w-24 sm:w-32 h-8 sm:h-10 flex items-center justify-center flex-shrink-0">
+                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 24" fill="black" class="h-6 sm:h-8 w-auto">
+                                            <path d="M0 4h28v3H0V4zm0 5h28v3H0V9zm0 5h28v3H0v-3zm0 5h28v3H0v-3zM32 4h14v3H32V4zm0 5h14v3H32V9zm0 5h14v3H32v-3zm0 5h14v3H32v-3zM50 4h28v3H50V4zm5.6 5H78v3H55.6V9zm0 5H78v3H55.6v-3zM50 19h28v3H50v-3z"/>
+                                            <path d="M55.6 9h5.7v3h-5.7V9zm0 5h5.7v3h-5.7v-3zM67 9h5.3v3H67V9zm0 5h5.3v3H67v-3z"/>
+                                        </svg>
+                                    </div>
+                                </div>
+                                <!-- Logos Set 2 (Duplicated for seamless loop) --><div class="flex space-x-12 sm:space-x-20 items-center">
+                                    <!-- Apple -->
+                                    <div class="logo-carousel-item w-24 sm:w-32 h-8 sm:h-10 flex items-center justify-center flex-shrink-0">
+                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="black" class="h-8 sm:h-10 w-auto">
+                                            <path d="M17.05 20.28c-.98.95-2.05.8-3.08.35-1.09-.46-2.09-.48-3.24 0-1.44.62-2.2.44-3.06-.35C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.5-1.31 2.99-2.54 4.09l.01-.01zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z"/>
+                                        </svg>
+                                    </div>
+                                    <!-- Microsoft -->
+                                    <div class="logo-carousel-item w-24 sm:w-32 h-8 sm:h-10 flex items-center justify-center flex-shrink-0">
+                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="h-7 sm:h-9 w-auto">
+                                            <path fill="#f35022" d="M2 2h9v9H2z"/>
+                                            <path fill="#81bc06" d="M13 2h9v9h-9z"/>
+                                            <path fill="#05a6f0" d="M2 13h9v9H2z"/>
+                                            <path fill="#ffba08" d="M13 13h9v9h-9z"/>
+                                        </svg>
+                                    </div>
+                                    <!-- Google -->
+                                    <div class="logo-carousel-item w-24 sm:w-32 h-8 sm:h-10 flex items-center justify-center flex-shrink-0">
+                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" class="h-6 sm:h-8 w-auto">
+                                            <path fill="#FFC107" d="M43.611 20.083H42V20H24v8h11.303c-1.649 4.84-6.237 8.546-11.303 8.546-6.663 0-12.115-5.385-12.115-12s5.452-12 12.115-12c3.125 0 5.918 1.114 8.169 2.908l6.097-6.097C37.55 5.309 31.97 2 24 2 13.516 2 5.291 9.354 5.291 19.967c0 10.613 8.225 19.167 18.709 19.167 10.931 0 18.349-7.989 18.349-18.795 0-1.151-.12-2.316-.339-3.468z"/>
+                                            <path fill="#FF3D00" d="M6.306 28.016v-8.038H0v14.167c1.373 0 2.658-.337 3.829-.982A12.001 12.001 0 0 0 5.29 39.133L10.985 34.42c-.896-1.558-1.529-3.111-1.848-4.706z"/>
+                                            <path fill="#4CAF50" d="M38.118 29.837c-.777 2.37-2.308 4.708-4.307 6.646L30.134 40.54a18.997 18.997 0 0 0 12.096-17.795h-6.112c-.08 1.155-.308 2.279-.684 3.332z"/>
+                                            <path fill="#1976D2" d="M43.611 20.083h-2.071l-6.097 6.097A12.052 12.052 0 0 1 24 31.967c-1.077 0-2.146-.178-3.15-.526L14.4 36.31l1.737 1.737C18.423 39.421 21.056 40 24 40c9.412 0 16.48-6.529 18.709-17.147l-6.097-6.097z"/>
+                                        </svg>
+                                    </div>
+                                    <!-- Amazon -->
+                                    <div class="logo-carousel-item w-24 sm:w-32 h-8 sm:h-10 flex items-center justify-center font-bold text-white/80 flex-shrink-0 font-serif">
+                                        <span class="text-xl sm:text-2xl">Amazon</span>
+                                    </div>
+                                    <!-- Meta -->
+                                    <div class="logo-carousel-item w-24 sm:w-32 h-8 sm:h-10 flex items-center justify-center font-bold text-white/80 flex-shrink-0 font-serif">
+                                        <span class="text-xl sm:text-2xl">Meta</span>
+                                    </div>
+                                    <!-- Tesla -->
+                                    <div class="logo-carousel-item w-24 sm:w-32 h-8 sm:h-10 flex items-center justify-center flex-shrink-0">
+                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 342 35" fill="black" class="h-6 sm:h-8 w-auto">
+                                            <path d="M0 0.5h342v34H0z" fill="none"/>
+                                            <path d="M238.1 14.4v21.1h7V21.3h25.6v14.2h7V14.4h-39.6zm-107.5.1v21h7v-8.8h10.7l9.1 8.8h8.9l-10.7-10.1c5.1-1.3 8.6-5.6 8.6-10.9 0-6.4-4.5-11-11.4-11h-22.2zm7 6.1h13.4c3.9 0 6.4 2.1 6.4 5.4 0 3.2-2.5 5.4-6.4 5.4h-13.4v-10.8zM42.7.2v6.1h46.6V.2H42.7zm94.3 0v6.1h46.6V.2h-46.6zM177.1.4h-38.7v5.8H160l-.2.5C149 12.7 139.5 24 134 35h3.1v.5h43.8v-5.8h-28.2l.5-.6C166.4 21.9 176.6 11.3 182 0l-4.9.4zM42.7 21.5c0 7.8 6.4 14.2 14.2 14.2h30.1v-7H59.7c-4.5 0-8.2-3.6-8.2-8.2h-8.8v1zm83.6-7c0-7.8-6.4-14.2-14.2-14.2H84.4v7h26.3c4.5 0 8.2 3.6 8.2 8.2h8.8v-1z"/>
+                                        </svg>
+                                    </div>
+                                    <!-- NVIDIA -->
+                                    <div class="logo-carousel-item w-24 sm:w-32 h-8 sm:h-10 flex items-center justify-center flex-shrink-0">
+                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 24" fill="#76b900" class="h-6 sm:h-8 w-auto">
+                                            <path d="M8.5 4.5v15h3.2V9.8l6.1 9.7h3.4V4.5h-3.2v9.6L11.9 4.5H8.5zm23.7 0l-5.8 15h3.4l1.2-3.3h6.3l1.2 3.3h3.5l-5.8-15h-4zm2 3.8l2.1 5.7h-4.2l2.1-5.7zm13.3-3.8v15h3.2V4.5h-3.2zm17 0h-8.3v15h8.3c3.8 0 6.9-3.1 6.9-7.5S69.3 4.5 65.5 4.5zm-.1 12h-5v-9h5c2.5 0 4.5 2 4.5 4.5s-2 4.5-4.5 4.5zm14.1-12v15h3.2V4.5h-3.2zm15.8 0l-5.1 8.2-5.1-8.2h-3.7v15h3.2V9.8l4.6 7.4h1.9l4.6-7.4v9.7h3.2v-15h-3.6z"/>
+                                        </svg>
+                                    </div>
+                                    <!-- Samsung -->
+                                    <div class="logo-carousel-item w-24 sm:w-32 h-8 sm:h-10 flex items-center justify-center flex-shrink-0">
+                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 24" fill="black" class="h-6 sm:h-8 w-auto">
+                                            <path d="M6 8c-.8 0-1.5.2-2.1.5L3 9V8H0v11h3v-6.5c0-1.1.7-1.9 1.8-1.9.9 0 1.5.6 1.5 1.6V19h3v-7.2c0-2.3-1.5-3.8-3.8-3.8h.5zm12.8 0c-.8 0-1.5.2-2.1.5L16 9V8h-3v11h3v-6.5c0-1.1.7-1.9 1.8-1.9.9 0 1.5.6 1.5 1.6V19h3v-7.2c0-2.3-1.5-3.8-3.8-3.8h.3zm8.7 0c-1.5 0-2.7.5-3.5 1.4-.7.8-1.1 1.9-1.1 3.3v1.6c0 1.4.4 2.5 1.1 3.3.8.9 2 1.4 3.5 1.4s2.7-.5 3.5-1.4c.7-.8 1.1-1.9 1.1-3.3v-1.6c0-1.4-.4-2.5-1.1-3.3-.8-.9-2-1.4-3.5-1.4zm1.7 6.3c0 1.2-.7 2-1.7 2s-1.7-.8-1.7-2v-1.6c0-1.2.7-2 1.7-2s1.7.8 1.7 2v1.6zm6.8-6.3c-1.5 0-2.7.5-3.5 1.4-.7.8-1.1 1.9-1.1 3.3v1.6c0 1.4.4 2.5 1.1 3.3.8.9 2 1.4 3.5 1.4s2.7-.5 3.5-1.4c.7-.8 1.1-1.9 1.1-3.3v-1.6c0-1.4-.4-2.5-1.1-3.3-.8-.9-2-1.4-3.5-1.4zm1.7 6.3c0 1.2-.7 2-1.7 2s-1.7-.8-1.7-2v-1.6c0-1.2.7-2 1.7-2s1.7.8 1.7 2v1.6zM52 19v-7.4c0-2.3 1.3-3.6 3.7-3.6.8 0 1.5.1 2.2.4l.8-2.5c-.9-.3-1.9-.5-3-.5-1.3 0-2.4.5-3.2 1.4l-.5.6V8h-3v11h3zm19.3-11c-1.5 0-2.7.5-3.5 1.4-.7.8-1.1 1.9-1.1 3.3v1.6c0 1.4.4 2.5 1.1 3.3.8.9 2 1.4 3.5 1.4 1.8 0 3.2-.7 4.1-2.2l.3-.5-2.4-1.4-.3.4c-.5.6-1.1.9-1.8.9-1 0-1.7-.6-1.8-1.6h6.6v-2c0-1.4-.4-2.5-1.1-3.3-.8-.9-2-1.3-3.6-1.3zm-1.7 4c.1-1 .8-1.6 1.7-1.6s1.6.6 1.7 1.6h-3.4zm13.9-4c-1.5 0-2.7.5-3.5 1.4-.7.8-1.1 1.9-1.1 3.3v1.6c0 1.4.4 2.5 1.1 3.3.8.9 2 1.4 3.5 1.4s2.7-.5 3.5-1.4c.7-.8 1.1-1.9 1.1-3.3v-1.6c0-1.4-.4-2.5-1.1-3.3-.8-.9-2-1.4-3.5-1.4zm1.7 6.3c0 1.2-.7 2-1.7 2s-1.7-.8-1.7-2v-1.6c0-1.2.7-2 1.7-2s1.7.8 1.7 2v1.6zM94 8v7.4c0 2.3-1.3 3.6-3.7 3.6-.8 0-1.5-.1-2.2-.4l-.8 2.5c.9.3 1.9.5 3 .5 1.3 0 2.4-.5 3.2-1.4l.5-.6V19h3V8h-3zm11.7 0c-.8 0-1.5.2-2.1.5l-.9.5V8h-3v15h3v-4.1l.9.5c.6.3 1.3.5 2.1.5 1.3 0 2.4-.5 3.2-1.4.7-.8 1.1-1.9 1.1-3.3v-1.5c0-1.4-.4-2.5-1.1-3.3-.8-.9-1.9-1.4-3.2-1.4zm1.4 6.2c0 1.2-.7 2-1.7 2s-1.7-.8-1.7-2v-1.5c0-1.2.7-2 1.7-2s1.7.8 1.7 2v1.5z"/>
+                                        </svg>
+                                    </div>
+                                    <!-- Oracle -->
+                                    <div class="logo-carousel-item w-24 sm:w-32 h-8 sm:h-10 flex items-center justify-center flex-shrink-0">
+                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 24" fill="#f80000" class="h-6 sm:h-8 w-auto">
+                                            <path d="M16.2 6C9.8 6 4.6 9.3 4.6 13.5S9.8 21 16.2 21s11.6-3.3 11.6-7.5S22.6 6 16.2 6zm0 12c-4.4 0-8-2-8-4.5s3.6-4.5 8-4.5 8 2 8 4.5-3.6 4.5-8 4.5zm26.4-6.5c0 2.5-1.3 4.5-3.8 4.5s-3.8-2-3.8-4.5V6h-3.5v5.5c0 4.2 2.5 7.5 7.3 7.5s7.3-3.3 7.3-7.5V6h-3.5v5.5zM55.8 6c-1.6 0-2.9.6-3.8 1.7V6h-3.5v13h3.5v-6.8c0-1.3.9-2.2 2.2-2.2 1.2 0 2.1.9 2.1 2.2V19h3.5v-7.5c0-3-2-5.5-4-5.5zm20.8 0c-5.2 0-9.4 3.3-9.4 7.5s4.2 7.5 9.4 7.5c3.2 0 6-1.3 7.6-3.4l-2.7-1.6c-1 1.3-2.6 2-4.9 2-2.5 0-4.6-1.3-5.4-3.5h13.7v-1c0-4.2-3.1-7.5-8.3-7.5zm-5.4 6c.8-2.1 2.8-3.5 5.4-3.5s4.6 1.4 5.4 3.5h-10.8zM93.1 6c-1.6 0-2.9.6-3.8 1.7V6h-3.5v13h3.5v-6.8c0-1.3.9-2.2 2.2-2.2 1.2 0 2.1.9 2.1 2.2V19h3.5v-7.5c0-3-2-5.5-4-5.5z"/>
+                                        </svg>
+                                    </div>
+                                    <!-- IBM -->
+                                    <div class="logo-carousel-item w-24 sm:w-32 h-8 sm:h-10 flex items-center justify-center flex-shrink-0">
+                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 24" fill="black" class="h-6 sm:h-8 w-auto">
+                                            <path d="M0 4h28v3H0V4zm0 5h28v3H0V9zm0 5h28v3H0v-3zm0 5h28v3H0v-3zM32 4h14v3H32V4zm0 5h14v3H32V9zm0 5h14v3H32v-3zm0 5h14v3H32v-3zM50 4h28v3H50V4zm5.6 5H78v3H55.6V9zm0 5H78v3H55.6v-3zM50 19h28v3H50v-3z"/>
+                                            <path d="M55.6 9h5.7v3h-5.7V9zm0 5h5.7v3h-5.7v-3zM67 9h5.3v3H67V9zm0 5h5.3v3H67v-3z"/>
+                                        </svg>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- END LOGO CAROUSEL -->
+                    <div class="flex flex-col sm:flex-row justify-center gap-4 sm:gap-4 font-serif mt-6 sm:mt-8 px-4">
+                        <!-- Glass Panel Buttons -->
+                        <div class="text-glass-panel px-6 sm:px-8 py-3 sm:py-4 text-base sm:text-lg font-medium cursor-pointer w-full sm:w-auto text-center">
+                            <span class="text-black">EXPLORE ARTICLES</span>
+                        </div>
+                        <div class="text-glass-panel px-6 sm:px-8 py-3 sm:py-4 text-base sm:text-lg font-medium cursor-pointer w-full sm:w-auto text-center">
+                            <span class="text-black">DONATE</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- NEW: Screenshot Panel as a separate overlapping element -->
+            <div class="relative z-30 -mt-32 sm:-mt-48 w-11/12 mx-auto px-4 sm:px-6 lg:px-8" style="perspective: 2000px; perspective-origin: center center;">
+                <div class="glass-screenshot-panel p-4 sm:p-6 rounded-3xl shadow-2xl">
+                    <div class="aspect-video w-full rounded-2xl overflow-hidden shadow-lg bg-black/20">
+                        <img src="screenshot.png" alt="Wikipedia Screenshot" class="w-full h-full object-cover">
+                    </div>
+                    <p class="text-center text-white/90 text-sm mt-4 font-serif font-medium">Explore Knowledge</p>
+                </div>
+            </div>
+
+            <!-- 2. About Us/Subheadline (Now starts under the screenshot panel) -->
+            <section id="box-2" class="bg-black text-white pt-24 sm:pt-32 md:pt-40 pb-16 sm:pb-24 relative -mt-16 sm:-mt-24 md:-mt-32 z-20 rounded-3xl shadow-2xl min-h-[80vh] flex flex-col justify-center w-11/12 mx-auto">
+                <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <!-- Glass Panel for the sub-header -->
+                    <div class="glass-panel p-6 sm:p-8 md:p-12 rounded-2xl shadow-2xl">
+                        <!-- Glass button with white styling -->
+                        <div class="inline-block bg-white/25 backdrop-filter backdrop-blur-lg border border-white/30 text-white text-xs font-medium uppercase tracking-wide px-4 py-2 rounded-full mb-4 shadow-lg font-serif" style="box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1), inset 0 1px 0 0 rgba(255, 255, 255, 0.2), inset 0 8px 16px -4px rgba(255, 255, 255, 0.1);">
+                            ABOUT WIKIPEDIA
+                        </div>
+                        <!-- NEW: Detail font is font-sans (Merriweather), reduced size -->
+                        <p class="text-lg sm:text-xl md:text-2xl font-light leading-relaxed">
+                            Wikipedia is a free online encyclopedia, created and edited by volunteers around the world and hosted by the Wikimedia Foundation.
+                        </p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 3. Features (NEW: Stacked Flashcards) --><section id="features" class="bg-white py-16 sm:py-20 relative -mt-24 sm:-mt-32 z-30 rounded-3xl shadow-2xl min-h-[100vh] flex flex-col justify-center overflow-hidden w-11/12 mx-auto">
+                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center w-full">
+                    <!-- Glass button with black styling --><div class="inline-block bg-black/25 backdrop-filter backdrop-blur-lg border border-black/30 text-black text-sm font-medium uppercase tracking-wide px-6 py-3 rounded-full mb-4 shadow-lg font-serif" style="box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1), inset 0 1px 0 0 rgba(255, 255, 255, 0.2), inset 0 8px 16px -4px rgba(211, 211, 211, 0.4);">
+                        HOW IT WORKS
+                    </div>
+                    <!-- NEW: Title font set to font-serif (Montserrat) --><h2 class="text-3xl sm:text-4xl md:text-5xl font-extrabold text-gray-900 mb-8 sm:mb-12 font-serif">
+                        Built by millions of contributors worldwide.
+                    </h2>
+
+                    <!-- NEW: Stacked Card Container --><div id="card-stack-container" class="relative h-[350px] sm:h-[450px] w-full max-w-md mx-auto">
+                        
+                        <!-- Card 4: API (Starts at the bottom) --><div class="card-stack-item absolute inset-0 bg-gray-50 border border-gray-200 rounded-2xl shadow-lg p-6 sm:p-8 text-left" data-index="3">
+                            <div class="flex items-center space-x-3 mb-4">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-code flex-shrink-0"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+                                <!-- NEW: Title font set to font-serif (Montserrat) --><h3 class="text-xl sm:text-2xl font-bold text-gray-900 font-serif">Excepteur Sint</h3>
+                            </div>
+                            <!-- NEW: Detail font is font-sans (Merriweather) --><p class="text-gray-600 text-base sm:text-lg">Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.</p>
+                        </div>
+                        
+                        <!-- Card 3: SaaS --><div class="card-stack-item absolute inset-0 bg-gray-50 border border-gray-200 rounded-2xl shadow-lg p-6 sm:p-8 text-left" data-index="2">
+                            <div class="flex items-center space-x-3 mb-4">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-cloud flex-shrink-0"><path d="M17.5 17.5c-1.5 0-3-.5-4.5-1.5s-3-2-4.5-3c-1.5-1-3-1.5-4.5-1.5s-3 .5-4.5 1.5s-3 2-4.5 3c-1.5 1-3 1.5-4.5 1.5s-3-.5-4.5-1.5s-3-2-4.5-3c-1.5-1-3-1.5-4.5-1.5s-3 .5-4.5 1.5s-3 2-4.5 3c-1.5 1-3 1.5-4.5 1.5"/></svg>
+                                <h3 class="text-lg sm:text-xl font-bold text-gray-900 font-serif">Consectetur Adipiscing</h3>
+                            </div>
+                            <p class="text-gray-600 text-base sm:text-lg">Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua quis nostrud exercitation ullamco.</p>
+                        </div>
+
+                        <!-- Card 2: Battery --><div class="card-stack-item absolute inset-0 bg-gray-50 border border-gray-200 rounded-2xl shadow-lg p-6 sm:p-8 text-left" data-index="1">
+                            <div class="flex items-center space-x-3 mb-4">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-battery-full flex-shrink-0"><rect width="16" height="10" x="2" y="7" rx="2" ry="2"/><line x1="22" x2="22" y1="11" y2="13"/><line x1="6" x2="6" y1="11" y2="13"/><line x1="10" x2="10" y1="11" y2="13"/><line x1="14" x2="14" y1="11" y2="13"/></svg>
+                                <h3 class="text-lg sm:text-xl font-bold text-gray-900 font-serif">Ut Labore Magna</h3>
+                            </div>
+                            <p class="text-gray-600 text-base sm:text-lg">Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo.</p>
+                        </div>
+
+                        <!-- Card 1: Load Scaling (Starts on top) --><div class="card-stack-item absolute inset-0 bg-gray-50 border border-gray-200 rounded-2xl shadow-lg p-6 sm:p-8 text-left" data-index="0">
+                            <div class="flex items-center space-x-3 mb-4">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-trello flex-shrink-0"><rect width="18" height="18" x="3" y="3" rx="2" ry="2"/><path d="M7 7h.01"/><path d="M11 7h.01"/><path d="M15 7h.01"/><path d="M7 11h.01"/><path d="M11 11h.01"/><path d="M15 11h.01"/><path d="M7 15h.01"/><path d="M11 15h.01"/><path d="M15 15h.01"/></svg>
+                                <h3 class="text-xl sm:text-2xl font-bold text-gray-900 font-serif">Collaborative Editing</h3>
+                            </div>
+                            <p class="text-gray-600 text-base sm:text-lg">Anyone can contribute to Wikipedia. Millions of volunteers worldwide work together to create and improve articles.</p>
+                        </div>
+
+                    </div>
+                    
+                    <p class="mt-8 text-gray-500 text-sm font-serif">(Swipe to explore)</p>
+
+                </div>
+            </section>
+
+            <!-- 4. Pricing/Plans Section -->
+            <section id="pricing" class="bg-transparent text-gray-900 py-16 sm:py-20 relative z-40 rounded-3xl min-h-[80vh] flex flex-col justify-center w-11/12 mx-auto mt-8 sm:mt-12">
+                <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 text-center w-full">
+                    <!-- Section Header -->
+                    <h2 class="text-3xl sm:text-4xl md:text-5xl font-extrabold text-gray-900 mb-6 font-serif">
+                        Support Wikipedia
+                    </h2>
+                    <p class="text-lg sm:text-xl text-gray-700 mb-12 max-w-3xl mx-auto">
+                        Wikipedia is funded by donations from readers like you. Your support helps keep knowledge free and accessible to everyone.
+                    </p>
+
+                    <!-- Pricing Cards -->
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8 mb-12">
+                        <!-- Starter Plan - White Glass -->
+                        <div class="p-6 sm:p-8 rounded-2xl text-left hover:scale-105 transition-transform duration-300 backdrop-filter backdrop-blur-lg border shadow-lg" style="background: rgba(255, 255, 255, 0.25); border-color: rgba(255, 255, 255, 0.3); box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1), inset 0 1px 0 0 rgba(255, 255, 255, 0.2), inset 0 8px 16px -4px rgba(211, 211, 211, 0.4);">
+                            <h3 class="text-2xl font-bold mb-4 font-serif text-gray-900">Reader</h3>
+                            <p class="text-gray-700 mb-6">Access all knowledge completely free.</p>
+                            <ul class="space-y-3 mb-8">
+                                <li class="flex items-start">
+                                    <svg class="w-5 h-5 text-green-600 mr-2 flex-shrink-0 mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                                    <span class="text-gray-800">60+ million articles</span>
+                                </li>
+                                <li class="flex items-start">
+                                    <svg class="w-5 h-5 text-green-600 mr-2 flex-shrink-0 mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                                    <span class="text-gray-800">300+ languages</span>
+                                </li>
+                                <li class="flex items-start">
+                                    <svg class="w-5 h-5 text-green-600 mr-2 flex-shrink-0 mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                                    <span class="text-gray-800">Adipiscing elit</span>
+                                </li>
+                                <li class="flex items-start">
+                                    <svg class="w-5 h-5 text-green-600 mr-2 flex-shrink-0 mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                                    <span class="text-gray-800">Eiusmod tempor</span>
+                                </li>
+                            </ul>
+                        </div>
+
+                        <!-- Professional Plan - Black Glass -->
+                        <div class="p-6 sm:p-8 rounded-2xl text-left hover:scale-105 transition-transform duration-300 backdrop-filter backdrop-blur-lg border shadow-lg" style="background: rgba(0, 0, 0, 0.25); border-color: rgba(17, 24, 39, 0.3); box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1), inset 0 1px 0 0 rgba(255, 255, 255, 0.2), inset 0 8px 16px -4px rgba(211, 211, 211, 0.4);">
+                            <div class="bg-gray-900 text-white text-xs font-bold uppercase px-3 py-1 rounded-full inline-block mb-4 font-serif">Popularis</div>
+                            <h3 class="text-2xl font-bold mb-4 font-serif text-gray-900">Ipsum</h3>
+                            <p class="text-gray-700 mb-6">Ut labore et dolore magna aliqua.</p>
+                            <ul class="space-y-3 mb-8">
+                                <li class="flex items-start">
+                                    <svg class="w-5 h-5 text-green-600 mr-2 flex-shrink-0 mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                                    <span class="text-gray-800">Ut enim ad minim</span>
+                                </li>
+                                <li class="flex items-start">
+                                    <svg class="w-5 h-5 text-green-600 mr-2 flex-shrink-0 mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                                    <span class="text-gray-800">Veniam quis nostrud</span>
+                                </li>
+                                <li class="flex items-start">
+                                    <svg class="w-5 h-5 text-green-600 mr-2 flex-shrink-0 mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                                    <span class="text-gray-800">Exercitation ullamco</span>
+                                </li>
+                                <li class="flex items-start">
+                                    <svg class="w-5 h-5 text-green-600 mr-2 flex-shrink-0 mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                                    <span class="text-gray-800">Laboris nisi</span>
+                                </li>
+                                <li class="flex items-start">
+                                    <svg class="w-5 h-5 text-green-600 mr-2 flex-shrink-0 mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                                    <span class="text-gray-800">Aliquip commodo</span>
+                                </li>
+                            </ul>
+                        </div>
+
+                        <!-- Enterprise Plan - White Glass -->
+                        <div class="p-6 sm:p-8 rounded-2xl text-left hover:scale-105 transition-transform duration-300 backdrop-filter backdrop-blur-lg border shadow-lg" style="background: rgba(255, 255, 255, 0.25); border-color: rgba(255, 255, 255, 0.3); box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1), inset 0 1px 0 0 rgba(255, 255, 255, 0.2), inset 0 8px 16px -4px rgba(211, 211, 211, 0.4);">
+                            <h3 class="text-2xl font-bold mb-4 font-serif text-gray-900">Dolor</h3>
+                            <p class="text-gray-700 mb-6">Excepteur sint occaecat cupidatat non proident.</p>
+                            <ul class="space-y-3 mb-8">
+                                <li class="flex items-start">
+                                    <svg class="w-5 h-5 text-green-600 mr-2 flex-shrink-0 mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                                    <span class="text-gray-800">Sunt in culpa qui</span>
+                                </li>
+                                <li class="flex items-start">
+                                    <svg class="w-5 h-5 text-green-600 mr-2 flex-shrink-0 mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                                    <span class="text-gray-800">Officia deserunt</span>
+                                </li>
+                                <li class="flex items-start">
+                                    <svg class="w-5 h-5 text-green-600 mr-2 flex-shrink-0 mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                                    <span class="text-gray-800">Mollit anim id</span>
+                                </li>
+                                <li class="flex items-start">
+                                    <svg class="w-5 h-5 text-green-600 mr-2 flex-shrink-0 mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                                    <span class="text-gray-800">Est laborum sed</span>
+                                </li>
+                                <li class="flex items-start">
+                                    <svg class="w-5 h-5 text-green-600 mr-2 flex-shrink-0 mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                                    <span class="text-gray-800">Cillum dolore</span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- CTA with glass styling -->
+                    <div class="p-8 sm:p-12 rounded-2xl max-w-3xl mx-auto backdrop-filter backdrop-blur-lg border shadow-lg" style="background: rgba(255, 255, 255, 0.25); border-color: rgba(255, 255, 255, 0.3); box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1), inset 0 1px 0 0 rgba(255, 255, 255, 0.2), inset 0 8px 16px -4px rgba(211, 211, 211, 0.4);">
+                        <h3 class="text-2xl sm:text-3xl font-bold mb-4 font-serif text-gray-900">Ready to Contribute?</h3>
+                        <p class="text-lg text-gray-700 mb-8">Join millions of editors worldwide and help make knowledge accessible to everyone. Every contribution matters.</p>
+                        <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                            <div class="text-glass-panel px-6 sm:px-8 py-3 sm:py-4 text-base sm:text-lg font-medium cursor-pointer w-full sm:w-auto text-center">
+                                <span class="text-black">START EDITING</span>
+                            </div>
+                            <div class="text-glass-panel px-6 sm:px-8 py-3 sm:py-4 text-base sm:text-lg font-medium cursor-pointer w-full sm:w-auto text-center">
+                                <span class="text-black">LEARN MORE</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+        </main>
+
+        <!-- Footer --><footer class="bg-transparent text-black py-16 relative z-40 mt-16">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="grid grid-cols-2 md:grid-cols-5 gap-10">
+                    <!-- Column 1: Logo & Tagline (using font-serif for logo text) --><div class="col-span-2 md:col-span-1">
+                        <a href="#" class="flex items-center space-x-2 text-2xl font-bold text-black mb-4 font-serif">
+                            <!-- Logo stroke set to black --><svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 24 24" fill="black" class="lucide lucide-book-open">
+                                <path d="M12 2L2 7v10c0 5.55 3.84 10 10 10s10-4.45 10-10V7L12 2z"/>
+                            </svg>
+                            <span>Wikipedia</span>
+                        </a>
+                        <p class="text-sm mt-2 text-gray-600">The free encyclopedia that anyone can edit.</p>
+                    </div>
+
+                    <!-- Column 2: Product --><div>
+                        <!-- Footer Headings set to font-serif (Montserrat) --><h4 class="text-black text-lg font-semibold mb-4 pb-2 font-serif">Read</h4>
+                        <ul class="space-y-4 text-sm leading-relaxed">
+                            <li><a href="#features" class="text-gray-700 hover:text-black transition duration-200">Featured Articles</a></li>
+                            <li><a href="#pricing" class="text-gray-700 hover:text-black transition duration-200">Random Article</a></li>
+                            <li><a href="#api" class="text-gray-700 hover:text-black transition duration-200">Current Events</a></li>
+                            <li><a href="#support" class="text-gray-700 hover:text-black transition duration-200">Categories</a></li>
+                        </ul>
+                    </div>
+
+                    <!-- Column 3: Company --><div>
+                        <h4 class="text-black text-lg font-semibold mb-4 pb-2 font-serif">Contribute</h4>
+                        <ul class="space-y-4 text-sm leading-relaxed">
+                            <li><a href="#" class="text-gray-700 hover:text-black transition duration-200">Create Account</a></li>
+                            <li><a href="#" class="text-gray-700 hover:text-black transition duration-200">Start Editing</a></li>
+                            <li><a href="#" class="text-gray-700 hover:text-black transition duration-200">Upload Files</a></li>
+                            <li><a href="#" class="text-gray-700 hover:text-black transition duration-200">Community Portal</a></li>
+                        </ul>
+                    </div>
+
+                    <!-- Column 4: Resources --><div>
+                        <h4 class="text-black text-lg font-semibold mb-4 pb-2 font-serif">Support</h4>
+                        <ul class="space-y-4 text-sm leading-relaxed">
+                            <li><a href="#" class="text-gray-700 hover:text-black transition duration-200">Help Center</a></li>
+                            <li><a href="#" class="text-gray-700 hover:text-black transition duration-200">Donate</a></li>
+                            <li><a href="#" class="text-gray-700 hover:text-black transition duration-200">Contact Us</a></li>
+                        </ul>
+                    </div>
+                    
+                    <!-- Column 5: Legal --><div>
+                        <h4 class="text-black text-lg font-semibold mb-4 pb-2 font-serif">About</h4>
+                        <ul class="space-y-4 text-sm leading-relaxed">
+                            <li><a href="#" class="text-gray-700 hover:text-black transition duration-200">About Wikipedia</a></li>
+                            <li><a href="#" class="text-gray-700 hover:text-black transition duration-200">Wikimedia Foundation</a></li>
+                            <li><a href="#" class="text-gray-700 hover:text-black transition duration-200">Privacy Policy</a></li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="mt-10 pt-8 text-center text-sm text-gray-600 font-serif">
+                    &copy; 2024 Wikimedia Foundation. All text is available under Creative Commons License.
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <!-- NEW: JavaScript for Stacked Card (Flashcard) Functionality -->
+    <script>
+        // Mobile menu functionality
+        document.addEventListener('DOMContentLoaded', () => {
+            const mobileMenuToggle = document.getElementById('mobile-menu-toggle');
+            const mobileMenu = document.getElementById('mobile-menu');
+            
+            if (mobileMenuToggle && mobileMenu) {
+                mobileMenuToggle.addEventListener('click', () => {
+                    mobileMenu.classList.toggle('hidden');
+                });
+                
+                // Close mobile menu when clicking on a link
+                const mobileMenuLinks = mobileMenu.querySelectorAll('a');
+                mobileMenuLinks.forEach(link => {
+                    link.addEventListener('click', () => {
+                        mobileMenu.classList.add('hidden');
+                    });
+                });
+                
+                // Close mobile menu when clicking outside
+                document.addEventListener('click', (e) => {
+                    if (!mobileMenuToggle.contains(e.target) && !mobileMenu.contains(e.target)) {
+                        mobileMenu.classList.add('hidden');
+                    }
+                });
+            }
+
+            // Scroll animations for boxes
+            const observerOptions = {
+                threshold: 0.15,
+                rootMargin: '0px 0px -50px 0px'
+            };
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('visible');
+                        // Add in-view class for screenshot panels
+                        if (entry.target.classList.contains('glass-screenshot-panel')) {
+                            entry.target.classList.add('in-view');
+                        }
+                    }
+                });
+            }, observerOptions);
+
+            // Observe all major sections
+            const sections = document.querySelectorAll('section, .glass-screenshot-panel');
+            sections.forEach(section => {
+                section.classList.add('scroll-fade-in');
+                observer.observe(section);
+            });
+
+            // Make first section visible immediately
+            const firstSection = document.querySelector('#box-1');
+            if (firstSection) {
+                firstSection.classList.add('visible');
+            }
+            
+            // Card stack functionality
+            const stackContainer = document.getElementById('card-stack-container');
+            if (!stackContainer) return;
+            
+            let cards = Array.from(stackContainer.querySelectorAll('.card-stack-item'));
+
+            let isDragging = false;
+            let startX = 0, startY = 0;
+            let diffX = 0, diffY = 0;
+            let activeCard = null;
+
+            function updateDeck() {
+                cards.forEach((card, index) => {
+                    // Reset opacity and transform before applying new styles
+                    card.style.opacity = '1';
+                    card.style.transform = '';
+                    
+                    if (index === 0) {
+                        // Top card
+                        card.style.zIndex = '30';
+                        card.style.transform = 'translateY(0) scale(1)';
+                        card.style.opacity = '1';
+                        card.style.pointerEvents = 'auto'; // Make it interactive
+                    } else if (index === 1) {
+                        // Second card (visible behind top card)
+                        card.style.zIndex = '20';
+                        card.style.transform = 'translateY(10px) scale(0.95)';
+                        card.style.opacity = '1';
+                        card.style.pointerEvents = 'none'; // Not interactive
+                    } else {
+                        // All other cards
+                        card.style.zIndex = '10';
+                        card.style.transform = `translateY(20px) scale(0.9)`;
+                        card.style.opacity = '0'; // Hide cards further down
+                        card.style.pointerEvents = 'none'; // Not interactive
+                    }
+                });
+            }
+
+            function startDrag(e) {
+                if (isDragging || !cards.length) return;
+                
+                activeCard = cards[0];
+                if (!activeCard) return;
+
+                isDragging = true;
+                activeCard.classList.add('is-dragging');
+
+                // Get initial position (mouse or touch)
+                startX = e.pageX || e.touches[0].pageX;
+                startY = e.pageY || e.touches[0].pageY;
+                
+                // Add move and end listeners to the whole document
+                document.addEventListener('mousemove', onDrag);
+                document.addEventListener('mouseup', endDrag);
+                document.addEventListener('touchmove', onDrag, { passive: false });
+                document.addEventListener('touchend', endDrag);
+            }
+
+            function onDrag(e) {
+                if (!isDragging || !activeCard) return;
+
+                e.preventDefault(); // Prevent scrolling while dragging
+                
+                const currentX = e.pageX || e.touches[0].pageX;
+                const currentY = e.pageY || e.touches[0].pageY;
+
+                diffX = currentX - startX;
+                diffY = currentY - startY;
+
+                // Calculate rotation based on horizontal movement
+                const rotate = diffX / 20; // Rotate 1 degree for every 20px moved
+
+                // Apply transform to move and rotate the card with smooth animation
+                activeCard.style.transform = `translate(${diffX}px, ${diffY}px) rotate(${rotate}deg)`;
+
+                // Fade out the top card as it's dragged
+                const opacity = 1 - (Math.abs(diffX) / (stackContainer.clientWidth / 2));
+                activeCard.style.opacity = Math.max(0, opacity);
+
+                // Scale up the next card
+                const nextCard = cards[1];
+                if (nextCard) {
+                    const scale = 0.95 + (Math.abs(diffX) / (stackContainer.clientWidth / 2)) * 0.05;
+                    const translateY = 10 - (Math.abs(diffX) / (stackContainer.clientWidth / 2)) * 10;
+                    nextCard.style.transform = `translateY(${translateY}px) scale(${Math.min(scale, 1)})`;
+                }
+            }
+
+            function endDrag(e) {
+                if (!isDragging || !activeCard) return;
+
+                isDragging = false;
+                activeCard.classList.remove('is-dragging');
+
+                // Remove document listeners
+                document.removeEventListener('mousemove', onDrag);
+                document.removeEventListener('mouseup', endDrag);
+                document.removeEventListener('touchmove', onDrag);
+                document.removeEventListener('touchend', endDrag);
+
+                // Check if swipe threshold is met
+                const swipeThreshold = stackContainer.clientWidth * 0.25; // 25% of container width
+                const swipeVelocity = Math.abs(diffX);
+
+                if (Math.abs(diffX) > swipeThreshold || swipeVelocity > 200) {
+                    // SWIPE: Animate card off-screen with enhanced easing
+                    const flyDirection = diffX > 0 ? 1 : -1;
+                    activeCard.classList.add('swiping-out');
+                    activeCard.style.transform = `translate(${flyDirection * 1200}px, ${diffY * 1.5}px) rotate(${flyDirection * 60}deg) scale(0.8)`;
+                    activeCard.style.opacity = '0';
+
+                    // Move card to the end of the array
+                    const swipedCard = cards.shift(); // Remove from top
+                    cards.push(swipedCard); // Add to bottom
+
+                    // After animation, reset the card and update the deck
+                    setTimeout(() => {
+                        swipedCard.classList.remove('swiping-out');
+                        swipedCard.style.transition = ''; // Remove transition for instant reset
+                        updateDeck(); // Re-stack all cards
+                    }, 600);
+
+                } else {
+                    // NO SWIPE: Animate card back to center with enhanced bounce
+                    activeCard.classList.add('returning');
+                    activeCard.style.transform = 'translate(0, 0) rotate(0deg) scale(1)';
+                    activeCard.style.opacity = '1';
+
+                    // Reset the next card smoothly
+                    const nextCard = cards[1];
+                    if (nextCard) {
+                        nextCard.style.transition = 'transform 0.5s cubic-bezier(0.68, -0.55, 0.27, 1.55)';
+                        nextCard.style.transform = 'translateY(10px) scale(0.95)';
+                    }
+
+                    // Clear transition after animation
+                    setTimeout(() => {
+                        activeCard.classList.remove('returning');
+                        activeCard.style.transition = '';
+                        if (nextCard) nextCard.style.transition = '';
+                    }, 500);
+                }
+
+                // Reset diffs
+                diffX = 0;
+                diffY = 0;
+                activeCard = null;
+            }
+
+            // Add initial listeners to the container
+            stackContainer.addEventListener('mousedown', startDrag);
+            stackContainer.addEventListener('touchstart', startDrag, { passive: true });
+
+            // Initial deck setup
+            updateDeck();
+        });
+        
+        // Energy Grid Dot Animation
+        document.addEventListener('DOMContentLoaded', function() {
+            const gridBg = document.querySelector('.energy-grid-bg');
+            if (!gridBg) return;
+            
+            const gridSize = 80; // Must match the grid size in CSS
+            let mouseX = null;
+            let mouseY = null;
+            let activeDots = [];
+            
+            // Track mouse position on desktop
+            gridBg.addEventListener('mousemove', function(e) {
+                const rect = gridBg.getBoundingClientRect();
+                mouseX = e.clientX - rect.left;
+                mouseY = e.clientY - rect.top;
+            });
+            
+            gridBg.addEventListener('mouseleave', function() {
+                mouseX = null;
+                mouseY = null;
+            });
+            
+            function createDot() {
+                const rect = gridBg.getBoundingClientRect();
+                const centerX = rect.width / 2;
+                const centerY = rect.height / 2;
+                
+                const dot = document.createElement('div');
+                dot.style.position = 'absolute';
+                dot.style.width = '6px';
+                dot.style.height = '6px';
+                dot.style.borderRadius = '50%';
+                dot.style.backgroundColor = 'rgba(0, 0, 0, 0.8)';
+                dot.style.zIndex = '10';
+                dot.style.pointerEvents = 'none';
+                dot.style.transform = 'translate(-50%, -50%)';
+                
+                // Random initial direction if no mouse
+                const angle = Math.random() * Math.PI * 2;
+                const speed = 2;
+                
+                const dotObj = {
+                    dot: dot,
+                    x: centerX,
+                    y: centerY,
+                    vx: Math.cos(angle) * speed,
+                    vy: Math.sin(angle) * speed,
+                    life: 3000,
+                    created: Date.now()
+                };
+                
+                gridBg.appendChild(dot);
+                activeDots.push(dotObj);
+            }
+            
+            // Animation loop
+            function animate() {
+                const rect = gridBg.getBoundingClientRect();
+                const centerX = rect.width / 2;
+                const centerY = rect.height / 2;
+                const now = Date.now();
+                
+                activeDots.forEach((dotObj, index) => {
+                    const age = now - dotObj.created;
+                    
+                    // Remove old dots
+                    if (age > dotObj.life) {
+                        dotObj.dot.remove();
+                        activeDots.splice(index, 1);
+                        return;
+                    }
+                    
+                    // If mouse is present, move towards it
+                    if (mouseX !== null && mouseY !== null) {
+                        const dx = mouseX - dotObj.x;
+                        const dy = mouseY - dotObj.y;
+                        const distance = Math.sqrt(dx * dx + dy * dy);
+                        
+                        if (distance > 1) {
+                            const speed = 3;
+                            dotObj.vx = (dx / distance) * speed;
+                            dotObj.vy = (dy / distance) * speed;
+                        }
+                    }
+                    
+                    // Update position
+                    dotObj.x += dotObj.vx;
+                    dotObj.y += dotObj.vy;
+                    
+                    // Update DOM
+                    dotObj.dot.style.left = dotObj.x + 'px';
+                    dotObj.dot.style.top = dotObj.y + 'px';
+                    
+                    // Fade out based on age
+                    const opacity = Math.max(0, 1 - (age / dotObj.life));
+                    dotObj.dot.style.opacity = opacity;
+                });
+                
+                requestAnimationFrame(animate);
+            }
+            
+            // Start animation loop
+            animate();
+            
+            // Create dots at intervals
+            setInterval(createDot, 400);
+        });
+        
+        // Interactive Tilt for Screenshot Panel
+        document.addEventListener('DOMContentLoaded', function() {
+            const screenshotPanel = document.querySelector('.glass-screenshot-panel');
+            if (!screenshotPanel) return;
+            
+            const baseTiltX = 10; // Base tilt (tilted backward)
+            const maxTilt = 25; // Maximum additional tilt angle in degrees
+            
+            screenshotPanel.addEventListener('mousemove', function(e) {
+                const rect = this.getBoundingClientRect();
+                const x = e.clientX - rect.left; // Mouse X position relative to element
+                const y = e.clientY - rect.top;  // Mouse Y position relative to element
+                
+                const centerX = rect.width / 2;
+                const centerY = rect.height / 2;
+                
+                // Calculate tilt based on mouse position
+                const tiltX = baseTiltX + ((y - centerY) / centerY) * maxTilt;
+                const tiltY = ((centerX - x) / centerX) * maxTilt;
+                
+                this.style.transform = `rotateX(${tiltX}deg) rotateY(${tiltY}deg)`;
+            });
+            
+            screenshotPanel.addEventListener('mouseleave', function() {
+                this.style.transform = `rotateX(${baseTiltX}deg) rotateY(0deg)`;
+            });
+        });
+    </script>
+
+</body>
+</html>
+
