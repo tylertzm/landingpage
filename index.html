@@ -251,6 +251,51 @@
         #card-stack-container {
             perspective: 1000px;
         }
+        
+        .card-arrow {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 100;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+        }
+        
+        @media (min-width: 768px) {
+            .card-arrow {
+                display: flex;
+            }
+        }
+        
+        .card-arrow:hover {
+            background: rgba(255, 255, 255, 1);
+            transform: translateY(-50%) scale(1.1);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+        }
+        
+        .card-arrow-left {
+            left: -60px;
+        }
+        
+        .card-arrow-right {
+            right: -60px;
+        }
+        
+        .card-arrow svg {
+            width: 24px;
+            height: 24px;
+            fill: black;
+        }
 
         .card-stack-item {
             transition: transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1), 
@@ -488,20 +533,8 @@
                     <!-- LOGO CAROUSEL WITH ACTUAL SVG LOGOS -->
                     <div class="w-full overflow-hidden py-6 sm:py-8 mt-8 sm:mt-12 mb-8 sm:mb-12 z-20"> 
                         <p class="text-xs uppercase tracking-wider text-gray-600 text-center mb-3 sm:mb-4 font-serif">Trusted partners</p>
-                        <div class="logo-carousel overflow-hidden relative">
-                            <!-- Left Arrow -->
-                            <button class="carousel-arrow carousel-arrow-left" onclick="scrollCarousel('left')">
-                                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                    <path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/>
-                                </svg>
-                            </button>
-                            <!-- Right Arrow -->
-                            <button class="carousel-arrow carousel-arrow-right" onclick="scrollCarousel('right')">
-                                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                    <path d="M8.59 16.59L10 18l6-6-6-6-1.41 1.41L13.17 12z"/>
-                                </svg>
-                            </button>
-                            <div class="logo-carousel-inner" id="logoCarouselInner">
+                        <div class="logo-carousel overflow-hidden">
+                            <div class="logo-carousel-inner">
                                 <!-- Duplicated sets for infinite scroll effect --><div class="flex space-x-12 sm:space-x-20 items-center"> 
                                     <!-- Apple -->
                                     <div class="logo-carousel-item w-24 sm:w-32 h-8 sm:h-10 flex items-center justify-center flex-shrink-0">
@@ -692,6 +725,18 @@
                     </h2>
 
                     <!-- NEW: Stacked Card Container --><div id="card-stack-container" class="relative h-[350px] sm:h-[450px] w-full max-w-md mx-auto">
+                        <!-- Left Arrow -->
+                        <button class="card-arrow card-arrow-left" onclick="navigateCards('prev')">
+                            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/>
+                            </svg>
+                        </button>
+                        <!-- Right Arrow -->
+                        <button class="card-arrow card-arrow-right" onclick="navigateCards('next')">
+                            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M8.59 16.59L10 18l6-6-6-6-1.41 1.41L13.17 12z"/>
+                            </svg>
+                        </button>
                         
                         <!-- Card 4: API (Starts at the bottom) --><div class="card-stack-item absolute inset-0 bg-gray-50 border border-gray-200 rounded-2xl shadow-lg p-6 sm:p-8 text-left" data-index="3">
                             <div class="flex items-center space-x-3 mb-4">
@@ -997,12 +1042,88 @@
             if (firstSection) {
                 firstSection.classList.add('visible');
             }
+        });
+        
+        // Global card order tracker
+        let cardOrder = [];
+        
+        // Card navigation function (must be global for onclick)
+        function navigateCards(direction) {
+            const stackContainer = document.getElementById('card-stack-container');
+            if (!stackContainer) return;
             
+            if (!cardOrder.length) {
+                cardOrder = Array.from(stackContainer.querySelectorAll('.card-stack-item'));
+            }
+            
+            if (!cardOrder.length) return;
+            
+            const topCard = cardOrder[0];
+            
+            if (direction === 'next') {
+                // Animate card out to the right
+                topCard.style.transition = 'transform 0.3s ease, opacity 0.3s ease';
+                topCard.style.transform = 'translateX(500px) rotate(20deg)';
+                topCard.style.opacity = '0';
+                
+                setTimeout(() => {
+                    // Move card to the back of our order array
+                    cardOrder.push(cardOrder.shift());
+                    updateCardDeck();
+                }, 300);
+            } else if (direction === 'prev') {
+                // Get the last card
+                const lastCard = cardOrder[cardOrder.length - 1];
+                
+                // Animate card in from the left
+                lastCard.style.transition = 'none';
+                lastCard.style.transform = 'translateX(-500px) rotate(-20deg)';
+                lastCard.style.opacity = '0';
+                
+                setTimeout(() => {
+                    // Move last card to front
+                    cardOrder.unshift(cardOrder.pop());
+                    
+                    lastCard.style.transition = 'transform 0.3s ease, opacity 0.3s ease';
+                    updateCardDeck();
+                }, 10);
+            }
+        }
+        
+        function updateCardDeck() {
+            if (!cardOrder.length) return;
+            
+            cardOrder.forEach((card, index) => {
+                if (index === 0) {
+                    card.style.zIndex = '30';
+                    card.style.transform = 'translateY(0) scale(1)';
+                    card.style.opacity = '1';
+                    card.style.pointerEvents = 'auto';
+                    card.style.transition = 'transform 0.3s ease, opacity 0.3s ease';
+                } else if (index === 1) {
+                    card.style.zIndex = '20';
+                    card.style.transform = 'translateY(10px) scale(0.95)';
+                    card.style.opacity = '1';
+                    card.style.pointerEvents = 'none';
+                    card.style.transition = 'transform 0.3s ease, opacity 0.3s ease';
+                } else {
+                    card.style.zIndex = '10';
+                    card.style.transform = `translateY(20px) scale(0.9)`;
+                    card.style.opacity = '0';
+                    card.style.pointerEvents = 'none';
+                    card.style.transition = 'transform 0.3s ease, opacity 0.3s ease';
+                }
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
             // Card stack functionality
             const stackContainer = document.getElementById('card-stack-container');
             if (!stackContainer) return;
             
-            let cards = Array.from(stackContainer.querySelectorAll('.card-stack-item'));
+            // Initialize the card order
+            cardOrder = Array.from(stackContainer.querySelectorAll('.card-stack-item'));
+            let cards = cardOrder;
 
             let isDragging = false;
             let startX = 0, startY = 0;
@@ -1110,9 +1231,10 @@
                     activeCard.style.transform = `translate(${flyDirection * 1200}px, ${diffY * 1.5}px) rotate(${flyDirection * 60}deg) scale(0.8)`;
                     activeCard.style.opacity = '0';
 
-                    // Move card to the end of the array
-                    const swipedCard = cards.shift(); // Remove from top
-                    cards.push(swipedCard); // Add to bottom
+                    // Move card to the end of the cardOrder array
+                    const swipedCard = cardOrder.shift(); // Remove from top
+                    cardOrder.push(swipedCard); // Add to bottom
+                    cards = cardOrder; // Update the local reference
 
                     // After animation, reset the card and update the deck
                     setTimeout(() => {
