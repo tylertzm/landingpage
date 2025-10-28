@@ -1,6 +1,6 @@
 import type React from "react"
 import type { Metadata } from "next"
-import { Merriweather } from "next/font/google"
+import { Merriweather, Montserrat } from "next/font/google"
 import { Analytics } from "@vercel/analytics/next"
 import "./globals.css"
 
@@ -10,6 +10,13 @@ const merriweather = Merriweather({
   weight: ["300", "400", "700"],
   style: ["normal", "italic"],
   variable: "--font-merriweather",
+})
+
+// Montserrat for headings (styled as serif in the design)
+const montserrat = Montserrat({
+  subsets: ["latin"],
+  weight: ["400", "600", "700", "800", "900"],
+  variable: "--font-montserrat",
 })
 
 export const metadata: Metadata = {
@@ -24,7 +31,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${merriweather.variable} font-sans antialiased`}>
+      <body className={`${merriweather.variable} ${montserrat.variable} font-sans antialiased`}>
         {children}
         <Analytics />
       </body>

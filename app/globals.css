@@ -76,8 +76,9 @@
 
 @theme inline {
   /* Updated to match index.html: Times New Roman for serif (titles) and Merriweather for sans (body) */
-  --font-serif: "Times New Roman", ui-sans-serif, system-ui, sans-serif;
-  --font-sans: var(--font-merriweather), Merriweather, ui-serif, Georgia, serif;
+  /* Map Tailwind v4 font tokens to Next.js font variables */
+  --font-sans: var(--font-montserrat), ui-sans-serif, system-ui, sans-serif;
+  --font-serif: var(--font-merriweather), ui-serif, Georgia, serif;
   --font-mono: ui-monospace, "Courier New", monospace;
   --color-background: var(--background);
   --color-foreground: var(--foreground);
@@ -115,6 +116,15 @@
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
+}
+
+/* Custom font utility aliases for clarity */
+@utility font-brand-sans {
+  font-family: var(--font-sans);
+}
+
+@utility font-brand-serif {
+  font-family: var(--font-serif);
 }
 
 @layer base {
@@ -165,6 +175,17 @@
   padding: 0.75rem 1.5rem;
   border-radius: 1rem;
   display: inline-block;
+  transition: box-shadow 180ms ease, filter 180ms ease, color 120ms ease;
+  will-change: transform, box-shadow, filter;
+}
+
+.text-glass-panel:hover {
+  box-shadow: 0 8px 28px 0 rgba(0, 0, 0, 0.16), inset 0 1px 0 0 rgba(255, 255, 255, 0.35), inset 0 10px 20px -6px rgba(211, 211, 211, 0.5);
+  filter: saturate(1.2) brightness(1.02);
+}
+
+.text-glass-panel:active {
+  box-shadow: 0 6px 18px 0 rgba(0, 0, 0, 0.14), inset 0 0 0 0 rgba(255, 255, 255, 0.3);
 }
 
 .glass-screenshot-panel {
@@ -193,9 +214,175 @@ html {
 }
 
 body {
-  /* Using system sans-serif as default body font for better readability */
-  font-family: ui-sans-serif, system-ui, sans-serif;
+  /* Let Tailwind's .font-sans/.font-serif control the font family (set on <body> via layout.tsx) */
   background-color: #ffffff;
+}
+
+/* Scroll Snap: snap the viewport to each section while accounting for the sticky header */
+:root { --snap-header: 6rem; }
+@media (min-width: 640px) { :root { --snap-header: 7rem; } }
+@media (min-width: 1024px) { :root { --snap-header: 8rem; } }
+
+html, body { height: 100%; }
+body {
+  scroll-snap-type: y mandatory; /* snap vertically on the viewport */
+  scroll-padding-top: var(--snap-header); /* ensure snapped section clears the sticky header */
+}
+
+/* Make each section a snap point aligned to the top (start) */
+section {
+  scroll-snap-align: start;
+  scroll-snap-stop: always; /* stop at each section even with fast scroll */
+}
+
+/* Anchor scrolling helpers */
+/* Provide headroom for sticky header so sections aren't hidden under it */
+section[id] {
+  scroll-margin-top: 6rem; /* ~96px */
+}
+@media (min-width: 640px) {
+  section[id] { scroll-margin-top: 7rem; }
+}
+@media (min-width: 1024px) {
+  section[id] { scroll-margin-top: 8rem; }
+}
+
+/* Jump-like attention animation when a section is navigated to via hash */
+@keyframes anchorJump {
+  0% { transform: translateY(-16px) scale(0.995); box-shadow: 0 0 0 0 rgba(17,24,39,0.0); }
+  30% { transform: translateY(8px) scale(1.005); box-shadow: 0 10px 24px rgba(0,0,0,0.06); }
+  60% { transform: translateY(-4px) scale(1.000); box-shadow: 0 6px 16px rgba(0,0,0,0.05); }
+  100% { transform: translateY(0) scale(1); box-shadow: 0 0 0 0 rgba(0,0,0,0.0); }
+}
+
+/* Apply a subtle jump and highlight when targeted */
+section:target {
+  animation: anchorJump 600ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* Class-based trigger to re-run jump even when clicking the same hash repeatedly */
+.anchor-jump {
+  animation: anchorJump 600ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  section:target { animation: none; }
+  .anchor-jump { animation: none !important; }
+}
+
+/* Hero overlay tags (3D tilted black/white badges) */
+.hero-tag {
+  padding: 12px 22px;
+  border-radius: 16px;
+  color: #fff;
+  text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.6);
+  font-weight: 900;
+  letter-spacing: -0.5px;
+  transform-style: preserve-3d;
+  transition: transform 0.4s cubic-bezier(0.25, 0.8, 0.25, 1), box-shadow 0.4s ease, filter 0.3s ease;
+  cursor: default;
+  user-select: none;
+}
+
+.hero-tag-bw {
+  background: linear-gradient(135deg, #333333 0%, #000000 100%);
+  border: 1px solid #555555;
+}
+
+.hero-tag-big {
+  font-size: clamp(1rem, 1.2vw + 0.8rem, 1.6rem);
+  padding: 16px 28px;
+  min-width: 200px;
+}
+
+.hero-tag-small {
+  font-size: clamp(0.9rem, 1vw + 0.6rem, 1.3rem);
+  padding: 14px 24px;
+}
+
+.hero-tag-left {
+  transform: rotateX(12deg) rotateY(-15deg) rotateZ(6deg);
+  box-shadow:
+    -15px 15px 20px rgba(0, 0, 0, 0.5),
+    0 0 50px rgba(100, 100, 100, 0.4);
+}
+.hero-tag-left:hover {
+  transform: rotateX(5deg) rotateY(-5deg) rotateZ(2deg) scale(1.03);
+  box-shadow:
+    -8px 8px 15px rgba(0, 0, 0, 0.7),
+    0 0 70px rgba(120, 120, 120, 0.6);
+  filter: saturate(1.05);
+}
+
+.hero-tag-right {
+  transform: rotateX(12deg) rotateY(15deg) rotateZ(-6deg);
+  box-shadow:
+    15px 15px 20px rgba(0, 0, 0, 0.5),
+    0 0 50px rgba(100, 100, 100, 0.4);
+}
+.hero-tag-right:hover {
+  transform: rotateX(5deg) rotateY(5deg) rotateZ(-2deg) scale(1.03);
+  box-shadow:
+    8px 8px 15px rgba(0, 0, 0, 0.7),
+    0 0 70px rgba(120, 120, 120, 0.6);
+  filter: saturate(1.05);
+}
+
+.hero-tag-plus {
+  font-size: 0.7em;
+  margin-right: 2px;
+  opacity: 0.85;
+  vertical-align: top;
+  font-weight: 700;
+}
+
+.hero-tag-label {
+  display: block;
+  font-size: 0.35em;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 4px;
+  margin-top: 4px;
+  opacity: 0.9;
+}
+
+/* Number color during counting (green), then inherit (white) when done */
+.hero-tag-value {
+  font-variant-numeric: tabular-nums;
+}
+.hero-tag-value.counting {
+  color: #16a34a; /* Tailwind emerald-600 */
+  transition: color 0.3s ease;
+}
+
+@media (max-width: 640px) {
+  .hero-tag-big {
+    min-width: 160px;
+  }
+}
+
+/* Gentle autonomous drift for hero tags using a wrapper to avoid overriding tilt transforms */
+@keyframes hero-drift-left {
+  0% { transform: translate3d(0, 0, 0); }
+  50% { transform: translate3d(6px, -4px, 0); }
+  100% { transform: translate3d(0, -2px, 0); }
+}
+
+@keyframes hero-drift-right {
+  0% { transform: translate3d(0, 0, 0); }
+  50% { transform: translate3d(-6px, -4px, 0); }
+  100% { transform: translate3d(0, -2px, 0); }
+}
+
+.hero-tag-float-left {
+  animation: hero-drift-left 6s ease-in-out infinite alternate;
+  will-change: transform;
+}
+
+.hero-tag-float-right {
+  animation: hero-drift-right 6s ease-in-out infinite alternate;
+  will-change: transform;
 }
 
 /* Scroll animations */
@@ -222,6 +409,66 @@ section.scroll-fade-in:not(.visible) {
 section.scroll-fade-in.visible {
   transform: translateY(0) scale(1);
   opacity: 1;
+}
+
+/* 3D hover effects for buttons */
+button,
+[role="button"],
+.btn-3d {
+  position: relative;
+  transform: translateZ(0);
+  transition: transform 180ms cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 180ms ease, filter 180ms ease;
+  will-change: transform, box-shadow;
+  backface-visibility: hidden;
+}
+
+/* Subtle default elevation; don’t override existing shadows aggressively */
+button,
+[role="button"],
+.btn-3d {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+button:hover,
+[role="button"]:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.14);
+}
+.btn-3d:hover {
+  /* JS controls transform for .btn-3d; only elevate shadow here */
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.14);
+}
+
+button:active,
+[role="button"]:active {
+  transform: translateY(0) scale(0.98);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
+}
+.btn-3d:active {
+  /* JS modifies transform; keep shadow feedback only */
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
+}
+
+/* High-contrast focus ring without layout shift */
+button:focus-visible,
+[role="button"]:focus-visible,
+.btn-3d:focus-visible {
+  outline: 2px solid rgba(59, 130, 246, 0.6); /* Tailwind blue-500/60 */
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  button,
+  [role="button"],
+  .btn-3d {
+    transition: box-shadow 120ms ease;
+  }
+  button:hover,
+  [role="button"]:hover,
+  .btn-3d:hover {
+    transform: none;
+  }
 }
 
 /* Mobile menu animations */
@@ -277,6 +524,75 @@ section.scroll-fade-in.visible {
   }
 }
 
+/* ======================
+   Bento Grid (Pricing)
+   ====================== */
+.bento-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1.5rem;
+  grid-auto-rows: auto; /* Let content decide height like earlier cards */
+}
+@media (max-width: 768px) {
+  .bento-grid { grid-template-columns: repeat(1, minmax(0, 1fr)); }
+}
+
+.bento-card {
+  position: relative;
+  border-radius: 1.25rem; /* ~20px */
+  background: linear-gradient(180deg, #07080a 0%, #050506 100%);
+  color: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.04);
+  box-shadow: 0 24px 70px rgba(0,0,0,0.45), inset 0 1px 0 rgba(255,255,255,0.05);
+  overflow: hidden;
+  transition: box-shadow 220ms ease, transform 200ms ease, filter 200ms ease;
+}
+
+.bento-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(1200px 400px at -10% -10%, rgba(99,102,241,0.18), transparent 60%),
+              radial-gradient(600px 300px at 110% 10%, rgba(236,72,153,0.14), transparent 60%);
+  pointer-events: none;
+}
+
+.bento-card:hover {
+  box-shadow: 0 30px 80px rgba(0,0,0,0.45), inset 0 1px 0 rgba(255,255,255,0.08);
+  filter: saturate(1.05);
+}
+
+.bento-number {
+  font-weight: 900;
+  letter-spacing: -0.02em;
+  line-height: 1;
+  background: linear-gradient(135deg, #fb923c 0%, #ef4444 35%, #ec4899 60%, #8b5cf6 100%);
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+}
+.bento-number-green { 
+  background: linear-gradient(135deg, #22c55e 0%, #84cc16 100%);
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+}
+
+.color-dots { display: flex; gap: 10px; align-items: center; }
+.color-dots .dot { width: 10px; height: 10px; border-radius: 9999px; box-shadow: 0 0 0 2px rgba(255,255,255,0.05) inset; }
+
+/* Donate quick amounts */
+.donate-amounts { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+.donate-amount {
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.1);
+  color: #fff;
+  padding: 0.4rem 0.75rem;
+  border-radius: 9999px;
+  font-weight: 600;
+  font-size: 0.9rem;
+  transition: background 160ms ease, border-color 160ms ease, transform 120ms ease;
+}
+.donate-amount:hover { background: rgba(255,255,255,0.12); transform: translateY(-1px); }
+.donate-amount:active { transform: translateY(0); }
+.donate-amount.selected { background: linear-gradient(135deg, #22c55e, #84cc16); color: #0b0b0c; border-color: transparent; }
+
 .logo-carousel-inner {
   display: flex;
   width: fit-content;
@@ -293,6 +609,70 @@ section.scroll-fade-in.visible {
     0.3s ease;
   cursor: grab;
   will-change: transform, opacity;
+}
+
+/* Arrow controls for card stack */
+#card-stack-container .card-arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 42px;
+  height: 42px;
+  border-radius: 9999px;
+  background: rgba(255, 255, 255, 0.95);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
+  display: grid;
+  place-items: center;
+  color: rgb(17, 24, 39);
+  transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease, opacity 0.2s ease;
+  z-index: 40;
+}
+
+#card-stack-container .card-arrow:hover {
+  transform: translateY(-50%) scale(1.05);
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.16);
+}
+
+#card-stack-container .card-arrow:active {
+  transform: translateY(-50%) scale(0.97);
+}
+
+#card-stack-container .card-arrow:focus-visible {
+  outline: 2px solid #111827;
+  outline-offset: 2px;
+}
+
+#card-stack-container .card-arrow svg {
+  width: 22px;
+  height: 22px;
+  fill: currentColor;
+}
+
+#card-stack-container .card-arrow-left {
+  left: -18px;
+}
+
+#card-stack-container .card-arrow-right {
+  right: -18px;
+}
+
+@media (max-width: 640px) {
+  #card-stack-container .card-arrow {
+    width: 36px;
+    height: 36px;
+    background: rgba(255, 255, 255, 0.9);
+  }
+  #card-stack-container .card-arrow svg {
+    width: 18px;
+    height: 18px;
+  }
+  #card-stack-container .card-arrow-left {
+    left: 8px;
+  }
+  #card-stack-container .card-arrow-right {
+    right: 8px;
+  }
 }
 
 .card-stack-item:hover {
