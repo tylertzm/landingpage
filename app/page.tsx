@@ -371,7 +371,7 @@ export default function Home() {
       {/* Header */}
       <header className="sticky top-0 z-50 glass-header rounded-b-3xl">
         <div className="max-w-7xl mx-auto flex justify-between items-center px-6 sm:px-8 lg:px-12 py-6">
-          <a href="#" className="flex items-center space-x-3 text-lg font-bold text-black font-mono flex-shrink-0">
+          <a href="#" className="flex items-center space-x-3 text-lg font-bold text-black font-serif flex-shrink-0">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               width="24"
@@ -382,43 +382,31 @@ export default function Home() {
               strokeWidth="2"
               strokeLinecap="round"
               strokeLinejoin="round"
-              className="lucide lucide-zap"
             >
-              <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
+              <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" />
+              <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" />
             </svg>
-            <span>LOREM</span>
+            <span>WIKIPEDIA</span>
           </a>
 
-          <nav className="hidden md:flex space-x-8 font-mono items-center ml-auto">
-            <a
-              href="#pricing"
-              className="text-gray-700 hover:text-black transition duration-150 px-4 py-2 rounded-lg font-medium text-sm"
-            >
-              Lorem
-            </a>
+          <nav className="hidden md:flex space-x-8 font-serif items-center ml-auto">
             <a
               href="#features"
-              className="text-gray-700 hover:text-black transition duration-150 px-4 py-2 rounded-lg font-medium text-sm"
+              className="text-gray-700 hover:text-black transition duration-150 px-3 py-2 rounded-lg font-medium text-base"
             >
-              Ipsum
+              How It Works
             </a>
             <a
-              href="#api"
-              className="text-gray-700 hover:text-black transition duration-150 px-4 py-2 rounded-lg font-medium text-sm"
+              href="#pricing"
+              className="text-gray-700 hover:text-black transition duration-150 px-3 py-2 rounded-lg font-medium text-base"
             >
-              Dolor
+              Support
             </a>
             <a
-              href="#support"
-              className="text-gray-700 hover:text-black transition duration-150 px-4 py-2 rounded-lg font-medium text-sm"
+              href="#box-2"
+              className="text-gray-700 hover:text-black transition duration-150 px-3 py-2 rounded-lg font-medium text-base"
             >
-              Sit
-            </a>
-            <a
-              href="#about"
-              className="text-gray-700 hover:text-black transition duration-150 px-4 py-2 rounded-lg font-medium text-sm"
-            >
-              Amet
+              About
             </a>
           </nav>
 
@@ -442,36 +430,24 @@ export default function Home() {
         </div>
 
         <div id="mobile-menu" className="md:hidden hidden bg-white/95 backdrop-blur-sm border-t border-gray-200">
-          <nav className="px-4 py-2 space-y-1 font-mono">
-            <a
-              href="#pricing"
-              className="block text-gray-600 hover:text-black transition duration-150 p-4 rounded-lg font-medium text-sm"
-            >
-              Lorem
-            </a>
+          <nav className="px-4 py-2 space-y-1 font-serif">
             <a
               href="#features"
-              className="block text-gray-600 hover:text-black transition duration-150 p-4 rounded-lg font-medium text-sm"
+              className="block text-gray-600 hover:text-black transition duration-150 p-3 rounded-lg font-medium"
             >
-              Ipsum
+              How It Works
             </a>
             <a
-              href="#api"
-              className="block text-gray-600 hover:text-black transition duration-150 p-4 rounded-lg font-medium text-sm"
+              href="#pricing"
+              className="block text-gray-600 hover:text-black transition duration-150 p-3 rounded-lg font-medium"
             >
-              Dolor
+              Support
             </a>
             <a
-              href="#support"
-              className="block text-gray-600 hover:text-black transition duration-150 p-4 rounded-lg font-medium text-sm"
+              href="#box-2"
+              className="block text-gray-600 hover:text-black transition duration-150 p-3 rounded-lg font-medium"
             >
-              Sit
-            </a>
-            <a
-              href="#about"
-              className="block text-gray-600 hover:text-black transition duration-150 p-4 rounded-lg font-medium text-sm"
-            >
-              Amet
+              About
             </a>
           </nav>
         </div>
@@ -487,18 +463,18 @@ export default function Home() {
 
           <div className="w-full max-w-5xl mx-auto text-center px-6 sm:px-8 md:px-12 lg:px-16 py-8 sm:py-10 md:py-12 relative z-10">
             <div className="mb-4 sm:mb-5">
-              <p className="text-xs uppercase tracking-widest font-semibold text-gray-600 font-serif text-glass-panel">
-                Lorem Ipsum Dolor Sit Amet
+              <p className="text-xs sm:text-sm uppercase tracking-widest font-semibold text-gray-600 font-serif text-glass-panel">
+                The Free Encyclopedia
               </p>
             </div>
             <div className="mb-5 sm:mb-6">
-              <h1 className="text-xl sm:text-2xl md:text-3xl font-extrabold leading-tight drop-shadow-sm font-serif px-2 text-glass-panel">
-                Consectetur Adipiscing Elit Sed
+              <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-extrabold leading-tight drop-shadow-sm font-serif px-2 text-glass-panel">
+                Imagine a world in which every single person on the planet is given free access to the sum of all human knowledge.
               </h1>
             </div>
             <div className="mb-8 sm:mb-10 flex justify-center">
-              <p className="text-sm sm:text-base font-light text-gray-700 max-w-4xl px-2 text-glass-panel leading-relaxed">
-                Do eiusmod tempor incididunt ut labore.
+              <p className="text-base sm:text-lg md:text-xl lg:text-2xl font-light text-gray-700 max-w-3xl px-2 text-glass-panel">
+                Wikipedia is a free online encyclopedia, created and edited by volunteers around the world.
               </p>
             </div>
 
@@ -722,11 +698,11 @@ export default function Home() {
             </div>
 
             <div className="flex flex-col sm:flex-row justify-center gap-5 sm:gap-6 font-serif mt-6 sm:mt-8 px-4">
-              <div className="text-glass-panel px-8 sm:px-10 py-4 sm:py-5 text-sm sm:text-base font-medium cursor-pointer w-full sm:w-auto text-center">
-                <span className="text-black">LOREM IPSUM</span>
+              <div className="text-glass-panel px-6 sm:px-8 py-3 sm:py-4 text-base sm:text-lg font-medium cursor-pointer w-full sm:w-auto text-center">
+                <span className="text-black">EXPLORE ARTICLES</span>
               </div>
-              <div className="text-glass-panel px-8 sm:px-10 py-4 sm:py-5 text-sm sm:text-base font-medium cursor-pointer w-full sm:w-auto text-center">
-                <span className="text-black">DOLOR SIT</span>
+              <div className="text-glass-panel px-6 sm:px-8 py-3 sm:py-4 text-base sm:text-lg font-medium cursor-pointer w-full sm:w-auto text-center">
+                <span className="text-black">DONATE</span>
               </div>
             </div>
           </div>
@@ -740,15 +716,15 @@ export default function Home() {
           <div className="glass-screenshot-panel p-6 sm:p-8 rounded-3xl shadow-2xl">
             <div className="aspect-video w-full rounded-2xl overflow-hidden shadow-lg bg-black/20">
               <Image
-                src="/placeholder.svg?height=720&width=1280"
-                alt="Lorem Ipsum Dashboard"
+                src="/screenshot.png"
+                alt="Wikipedia Article Example"
                 width={1280}
                 height={720}
                 className="w-full h-full object-cover"
               />
             </div>
             <p className="text-center text-white/90 text-xs sm:text-sm mt-5 font-serif font-medium">
-              Lorem Ipsum Dolor
+              Featured Article
             </p>
           </div>
         </div>
@@ -760,12 +736,11 @@ export default function Home() {
         >
           <div className="max-w-5xl mx-auto px-6 sm:px-8 lg:px-12">
             <div className="glass-panel p-8 sm:p-10 md:p-14 rounded-2xl shadow-2xl">
-              <button className="bg-transparent border border-white text-white text-xs font-medium uppercase tracking-wide px-6 py-3 rounded-full mb-6 hover:bg-white/10 transition duration-200 font-serif">
-                LOREM IPSUM
-              </button>
+              <div className="inline-block bg-white/25 backdrop-filter backdrop-blur-lg border border-white/30 text-white text-sm font-medium uppercase tracking-wide px-6 py-3 rounded-full mb-4 shadow-lg font-serif" style={{ boxShadow: "0 4px 16px rgba(0, 0, 0, 0.1), inset 0 1px 0 0 rgba(255, 255, 255, 0.2), inset 0 8px 16px -4px rgba(211, 211, 211, 0.4)" }}>
+                ABOUT WIKIPEDIA
+              </div>
               <p className="text-base sm:text-lg font-light leading-relaxed">
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et
-                dolore magna aliqua.
+                Wikipedia is a multilingual free online encyclopedia written and maintained by a community of volunteers through a model of open collaboration. Individual contributors, also called editors, are known as Wikipedians.
               </p>
             </div>
           </div>

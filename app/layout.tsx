@@ -1,24 +1,20 @@
 import type React from "react"
 import type { Metadata } from "next"
-import { Playfair_Display, JetBrains_Mono } from "next/font/google"
+import { Merriweather } from "next/font/google"
 import { Analytics } from "@vercel/analytics/next"
 import "./globals.css"
 
-const playfairDisplay = Playfair_Display({
+// Merriweather for body text (styled as sans in the design)
+const merriweather = Merriweather({
   subsets: ["latin"],
-  weight: ["400", "600", "700", "800", "900"],
+  weight: ["300", "400", "700"],
   style: ["normal", "italic"],
-})
-
-const jetbrainsMono = JetBrains_Mono({
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
+  variable: "--font-merriweather",
 })
 
 export const metadata: Metadata = {
-  title: "v0 App",
-  description: "Created with v0",
-  generator: "v0.app",
+  title: "Wikipedia - The Free Encyclopedia",
+  description: "The free encyclopedia that anyone can edit",
 }
 
 export default function RootLayout({
@@ -28,7 +24,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`font-sans antialiased`}>
+      <body className={`${merriweather.variable} font-sans antialiased`}>
         {children}
         <Analytics />
       </body>

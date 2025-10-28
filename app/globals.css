@@ -75,10 +75,10 @@
 }
 
 @theme inline {
-  /* Updated to use Playfair Display (serif) and Arial (Sans) */
-  --font-serif: "Playfair Display", "Playfair Display Fallback", Georgia, serif;
-  --font-mono: "Arial", "Courier New", monospace;
-  --font-sans: ui-sans-serif, system-ui, sans-serif;
+  /* Updated to match index.html: Times New Roman for serif (titles) and Merriweather for sans (body) */
+  --font-serif: "Times New Roman", ui-sans-serif, system-ui, sans-serif;
+  --font-sans: var(--font-merriweather), Merriweather, ui-serif, Georgia, serif;
+  --font-mono: ui-monospace, "Courier New", monospace;
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);
